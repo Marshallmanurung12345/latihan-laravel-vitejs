@@ -141,7 +141,8 @@ export default function HomePage() {
                                             {plan.title}
                                         </h4>
                                         <p className="text-sm text-gray-500 mt-1 line-clamp-2">
-                                            {plan.description || "Tidak ada deskripsi"}
+                                            {plan.description ||
+                                                "Tidak ada deskripsi"}
                                         </p>
                                         <p className="text-xs text-gray-400 mt-2">
                                             Dibuat pada:{" "}
@@ -152,12 +153,16 @@ export default function HomePage() {
                                     </div>
                                     <div className="flex items-center space-x-2 ml-4">
                                         <Link
+                                            href={route("plans.show", plan.id)}
+                                        >
+                                            <Button variant="default" size="sm">
+                                                Detail
+                                            </Button>
+                                        </Link>
+                                        <Link
                                             href={route("plans.edit", plan.id)}
                                         >
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                            >
+                                            <Button variant="outline" size="sm">
                                                 Ubah
                                             </Button>
                                         </Link>
@@ -184,10 +189,7 @@ export default function HomePage() {
                         )}
                     </div>
                     {plans.meta?.links && (
-                        <Pagination
-                            links={plans.meta.links}
-                            className="mt-6"
-                        />
+                        <Pagination links={plans.meta.links} className="mt-6" />
                     )}
                 </div>
             </div>

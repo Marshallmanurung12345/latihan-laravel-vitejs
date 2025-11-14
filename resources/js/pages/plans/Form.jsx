@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useForm, Head, Link } from "@inertiajs/react";
 import AppLayout from "@/layouts/AppLayout";
 import { Button } from "@/components/ui/button";
@@ -13,11 +13,31 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function FormPage({ plan }) {
     const isEditing = !!plan;
+    const fileInputRef = useRef();
+    const [previewUrl, setPreviewUrl] = useState(plan?.cover_image_url || null);
 
     const { data, setData, post, put, processing, errors } = useForm({
         title: plan?.title || "",
         content: plan?.content || "",
+        cover_image: null,
+        _method: isEditing ? "PUT" : "POST",
     });
+
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setData("cover_image", file);
+            setPreviewUrl(URL.createObjectURL(file));
+        }
+    };
+
+    const clearImage = () => {
+        setData("cover_image", null);
+        setPreviewUrl(null);
+        if (fileInputRef.current) {
+            fileInputRef.current.value = "";
+        }
+    };
 
     function handleSubmit(e) {
         e.preventDefault();
@@ -25,11 +45,20 @@ export default function FormPage({ plan }) {
             preserveScroll: true,
         };
         if (isEditing) {
-            put(route("plans.update", plan.id), options);
+            // Inertia's 'put' method doesn't support multipart/form-data well.
+            // We use 'post' with a spoofed '_method' for file uploads on updates.
+            post(route("plans.update", plan.id), options);
         } else {
             post(route("plans.store"), options);
         }
     }
+    useEffect(() => {
+        return () => {
+            if (previewUrl && previewUrl.startsWith("blob:")) {
+                URL.revokeObjectURL(previewUrl);
+            }
+        };
+    }, [previewUrl]);
 
     return (
         <AppLayout>
@@ -84,6 +113,41 @@ export default function FormPage({ plan }) {
                                     {errors.content && (
                                         <FieldDescription className="text-destructive">
                                             {errors.content}
+                                        </FieldDescription>
+                                    )}
+                                </Field>
+
+                                <Field>
+                                    <FieldLabel htmlFor="cover_image">
+                                        Foto Sampul (Opsional)
+                                    </FieldLabel>
+                                    {previewUrl && (
+                                        <div className="mt-2 mb-4">
+                                            <img
+                                                src={previewUrl}
+                                                alt="Pratinjau"
+                                                className="w-full h-48 object-cover rounded-md"
+                                            />
+                                            <Button
+                                                type="button"
+                                                variant="link"
+                                                className="text-destructive px-0"
+                                                onClick={clearImage}
+                                            >
+                                                Hapus Gambar
+                                            </Button>
+                                        </div>
+                                    )}
+                                    <Input
+                                        type="file"
+                                        id="cover_image"
+                                        onChange={handleFileChange}
+                                        ref={fileInputRef}
+                                        aria-invalid={!!errors.cover_image}
+                                    />
+                                    {errors.cover_image && (
+                                        <FieldDescription className="text-destructive">
+                                            {errors.cover_image}
                                         </FieldDescription>
                                     )}
                                 </Field>

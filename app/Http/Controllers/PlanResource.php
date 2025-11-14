@@ -19,7 +19,7 @@ class PlanResource extends JsonResource
             'id' => $this->id,
             'title' => $this->title,
             'content' => $this->content,
-            'cover' => $this->cover ? Storage::url($this->cover) : null,
+            'cover_image_url' => $this->cover_image_url, // Menggunakan accessor dari model
         ];
     }
 }
