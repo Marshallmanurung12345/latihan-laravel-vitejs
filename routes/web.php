@@ -18,10 +18,13 @@ Route::middleware(['handle.inertia'])->group(function () {
     });
 
     Route::group(['middleware' => 'check.auth'], function () {
-        Route::get('/', [HomeController::class, 'home'])->name('home');
+        // Mengganti HomeController dengan PlanController untuk halaman utama
+        Route::get('/', [PlanController::class, 'index'])->name('home');
 
         // Routes untuk Rencana (Plans)
-        Route::get('/plans/create', [PlanController::class, 'create'])->name('plans.create');
-        Route::post('/plans', [PlanController::class, 'store'])->name('plans.store');
+        Route::resource('plans', PlanController::class)->except(['index']);
+
+        // Route khusus untuk update cover
+        Route::post('/plans/{plan}/cover', [PlanController::class, 'updateCover'])->name('plans.cover.update');
     });
 });
