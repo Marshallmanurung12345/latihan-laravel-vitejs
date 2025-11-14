@@ -59,6 +59,13 @@ export default function HomePage() {
         });
     };
 
+    const handleToggleComplete = (plan) => {
+        router.patch(route("plans.toggleComplete", plan.id), {}, {
+            preserveScroll: true,
+            preserveState: true,
+        });
+    };
+
     // Konfigurasi untuk ApexCharts
     const chartOptions = {
         chart: {
@@ -138,11 +145,21 @@ export default function HomePage() {
                                 >
                                     <div className="flex-1">
                                         <h4 className="font-bold text-lg">
+                                    <div className="flex items-center flex-1">
+                                        <input
+                                            type="checkbox"
+                                            checked={!!plan.completed_at}
+                                            onChange={() => handleToggleComplete(plan)}
+                                            className="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 mr-4"
+                                            aria-label={`Tandai ${plan.title} sebagai selesai`}
+                                        />
+                                        <div className="flex-1">
+                                        <h4 className={`font-bold text-lg ${plan.completed_at ? 'line-through text-gray-400' : ''}`}>
                                             {plan.title}
                                         </h4>
                                         <p className="text-sm text-gray-500 mt-1 line-clamp-2">
-                                            {plan.description ||
-                                                "Tidak ada deskripsi"}
+                                            <p className={`text-sm mt-1 line-clamp-2 ${plan.completed_at ? 'text-gray-400' : 'text-gray-500'}`}>
+                                            {plan.content}
                                         </p>
                                         <p className="text-xs text-gray-400 mt-2">
                                             Dibuat pada:{" "}

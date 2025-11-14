@@ -66,12 +66,14 @@ class PlanController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
-            'cover' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        if ($request->hasFile('cover')) {
-            $validated['cover'] = $request->file('cover')->store('covers', 'public');
+        if ($request->hasFile('cover_image')) {
+            $validated['cover'] = $request->file('cover_image')->store('covers', 'public');
         }
+        // Hapus cover_image dari array yang divalidasi karena tidak ada di tabel database
+        unset($validated['cover_image']);
 
         Plan::create($validated);
 
@@ -96,16 +98,18 @@ class PlanController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
-            'cover' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        if ($request->hasFile('cover')) {
+        if ($request->hasFile('cover_image')) {
             // Hapus cover lama jika ada
             if ($plan->cover) {
                 Storage::disk('public')->delete($plan->cover);
             }
-            $validated['cover'] = $request->file('cover')->store('covers', 'public');
+            $validated['cover'] = $request->file('cover_image')->store('covers', 'public');
         }
+        // Hapus cover_image dari array yang divalidasi
+        unset($validated['cover_image']);
 
         $plan->update($validated);
 
