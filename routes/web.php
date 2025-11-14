@@ -21,6 +21,8 @@ Route::middleware(['handle.inertia'])->group(function () {
         // Gunakan route resource untuk semua aksi CRUD pada Plan.
         // Ini akan secara otomatis membuat route untuk index, create, store, show, edit, update, destroy.
         Route::resource('plans', PlanController::class);
+        // Rute untuk menangani upload file dari Trix Editor
+        Route::post('/plans/attachments', [PlanController::class, 'storeAttachment'])->name('plans.attachments.store');
         // Jadikan halaman utama (/) mengarah ke daftar rencana (plans.index).
         Route::get('/', [PlanController::class, 'index'])->name('home');
     });

@@ -125,4 +125,21 @@ class PlanController extends Controller
         return to_route('plans.index')->with('success', 'Rencana berhasil dihapus!');
     }
 
+    /**
+     * Menyimpan file attachment dari Trix Editor.
+     */
+    public function storeAttachment(Request $request)
+    {
+        $request->validate([
+            'attachment' => 'required|file|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        if ($request->hasFile('attachment')) {
+            $path = $request->file('attachment')->store('attachments', 'public');
+            $url = Storage::disk('public')->url($path);
+
+            return response()->json(['url' => $url], 200);
+        }
+    }
+
 }

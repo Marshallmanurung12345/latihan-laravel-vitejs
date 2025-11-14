@@ -1,6 +1,6 @@
 import { Head, Link, router, useForm } from "@inertiajs/react";
-import React, { useEffect } from "react";
-import { TrixEditor } from "react-trix";
+import React, { useEffect, useRef } from "react";
+import { TrixEditor } from "react-trix"; // Pastikan TrixEditor diimpor
 import "trix/dist/trix.css"; // Pastikan CSS Trix diimpor
 
 export default function Form({ plan }) {
@@ -10,6 +10,7 @@ export default function Form({ plan }) {
         cover: null,
         _method: plan ? "PUT" : "POST", // Untuk spoofing method di Laravel
     });
+    const trixEditorRef = useRef(null);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -24,6 +25,14 @@ export default function Form({ plan }) {
         setData("content", html);
     };
 
+    // Mengatur nilai awal Trix Editor saat komponen dimuat
+    useEffect(() => {
+        const editor = trixEditorRef.current?.editor;
+        if (editor && data.content && editor.html !== data.content) {
+            editor.loadHTML(data.content);
+        }
+    }, [plan]); // Hanya dijalankan saat 'plan' berubah
+
     // Menangani upload file di Trix Editor
     useEffect(() => {
         const handleAttachmentAdd = (event) => {
@@ -37,18 +46,20 @@ export default function Form({ plan }) {
                     method: "POST",
                     body: formData,
                     headers: {
-                        "X-CSRF-TOKEN": document.head.querySelector('meta[name="csrf-token"]').content,
+                        "X-CSRF-TOKEN": document.head.querySelector(
+                            'meta[name="csrf-token"]'
+                        ).content,
                     },
                 })
-                .then((response) => response.json())
-                .then((data) => {
-                    // Beritahu Trix URL gambar yang sudah diupload
-                    attachment.setAttributes({
-                        url: data.url,
-                        href: data.url,
-                    });
-                })
-                .catch((error) => console.error("Upload error:", error));
+                    .then((response) => response.json())
+                    .then((data) => {
+                        // Beritahu Trix URL gambar yang sudah diupload
+                        attachment.setAttributes({
+                            url: data.url,
+                            href: data.url,
+                        });
+                    })
+                    .catch((error) => console.error("Upload error:", error));
             }
         };
 
@@ -56,7 +67,10 @@ export default function Form({ plan }) {
 
         // Cleanup listener saat komponen di-unmount
         return () => {
-            document.removeEventListener("trix-attachment-add", handleAttachmentAdd);
+            document.removeEventListener(
+                "trix-attachment-add",
+                handleAttachmentAdd
+            );
         };
     }, []);
 
@@ -108,12 +122,14 @@ export default function Form({ plan }) {
                                 htmlFor="content"
                                 className="block text-sm font-medium text-gray-700 mb-1"
                             >
-                                Konten
+                                Catatan
                             </label>
                             <TrixEditor
                                 className="trix-content"
-                                value={data.content}
+                                placeholder="Tulis detail rencanamu di sini..."
+                                value={undefined}
                                 onChange={handleTrixChange}
+                                ref={trixEditorRef}
                             />
                             {errors.content && (
                                 <div className="text-red-500 text-xs mt-1">
@@ -148,7 +164,13 @@ export default function Form({ plan }) {
                         {/* Progress Bar untuk Upload */}
                         {progress && (
                             <div className="w-full bg-gray-200 rounded-full mb-4">
-                                <div className="bg-blue-600 text-xs font-medium text-blue-100 text-center p-0.5 leading-none rounded-full" style={{ width: `${progress.percentage}%` }}> {progress.percentage}%</div>
+                                <div
+                                    className="bg-blue-600 text-xs font-medium text-blue-100 text-center p-0.5 leading-none rounded-full"
+                                    style={{ width: `${progress.percentage}%` }}
+                                >
+                                    {" "}
+                                    {progress.percentage}%
+                                </div>
                             </div>
                         )}
 
