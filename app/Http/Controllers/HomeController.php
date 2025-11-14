@@ -9,7 +9,7 @@ class HomeController extends Controller
 {
     public function home()
     {
-        return Inertia::render('Home', [
+        return Inertia::render('app/HomePage', [
             'plans' => Plan::latest()->get(),
         ]);
     }
