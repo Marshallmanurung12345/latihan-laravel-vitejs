@@ -18,13 +18,10 @@ Route::middleware(['handle.inertia'])->group(function () {
     });
 
     Route::group(['middleware' => 'check.auth'], function () {
-        // Mengganti HomeController dengan PlanController untuk halaman utama
+        // Gunakan route resource untuk semua aksi CRUD pada Plan.
+        // Ini akan secara otomatis membuat route untuk index, create, store, show, edit, update, destroy.
+        Route::resource('plans', PlanController::class);
+        // Jadikan halaman utama (/) mengarah ke daftar rencana (plans.index).
         Route::get('/', [PlanController::class, 'index'])->name('home');
-
-        // Routes untuk Rencana (Plans)
-        Route::resource('plans', PlanController::class)->except(['index']);
-
-        // Route khusus untuk update cover
-        Route::post('/plans/{plan}/cover', [PlanController::class, 'updateCover'])->name('plans.cover.update');
     });
 });

@@ -35,6 +35,6 @@ class NoteController extends Controller
 
         Note::create($validated);
 
-        return to_route('notes.index')->with('message', 'Catatan berhasil ditambahkan!');
+        return to_route('notes.index')->with('success', 'Catatan berhasil ditambahkan!');
     }
 }

@@ -2,15 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Plan;
-use Inertia\Inertia;
+use Illuminate\Http\RedirectResponse;
 
 class HomeController extends Controller
 {
-    public function home()
+    public function home(): RedirectResponse
     {
-        return Inertia::render('app/HomePage', [
-            'plans' => Plan::latest()->get(),
-        ]);
+        return redirect()->action([PlanController::class, 'index']);
     }
 }

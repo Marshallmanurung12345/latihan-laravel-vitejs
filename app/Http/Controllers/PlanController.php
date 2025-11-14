@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\PlanResource;
+
 use App\Models\Plan;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -12,31 +14,38 @@ use Inertia\Response;
 class PlanController extends Controller
 {
     /**
-     * Menampilkan daftar semua rencana dengan paginasi dan filter.
+     * Menampilkan daftar semua rencana.
      */
     public function index(Request $request): Response
     {
-        $plans = Plan::query()
+        $plansQuery = Plan::query()
             ->when($request->input('search'), function ($query, $search) {
                 $query->where('title', 'like', "%{$search}%")
                     ->orWhere('content', 'like', "%{$search}%");
             })
-            ->latest()
-            ->paginate(20)
-            ->withQueryString();
+            ->latest();
 
         // Statistik untuk ApexCharts
         $stats = [
             'total' => Plan::count(),
-            'done' => 0, // Ganti dengan logika status jika ada
-            'pending' => Plan::count(), // Ganti dengan logika status jika ada
+            'done' => Plan::whereNotNull('completed_at')->count(),
+            'pending' => Plan::whereNull('completed_at')->count(),
         ];
 
-        return Inertia::render('app/HomePage', [
-            'plans' => $plans,
+        return Inertia::render('app/HomePage', [ // Kembali ke komponen yang ada
+            // Gunakan Resource Collection untuk transformasi data paginasi
+            'plans' => PlanResource::collection($plansQuery->paginate(20)->withQueryString()),
             'filters' => $request->only(['search']),
             'stats' => $stats,
         ]);
+    }
+
+    /**
+     * Menampilkan detail satu rencana (jika diperlukan).
+     */
+    public function show(Plan $plan): Response
+    {
+        return Inertia::render('plans/Show', ['plan' => new PlanResource($plan)]);
     }
 
     /**
@@ -44,7 +53,7 @@ class PlanController extends Controller
      */
     public function create(): Response
     {
-        return Inertia::render('Plans/Form', [
+        return Inertia::render('plans/Form', [
             'plan' => null,
         ]);
     }
@@ -57,11 +66,16 @@ class PlanController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
+            'cover' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
+
+        if ($request->hasFile('cover')) {
+            $validated['cover'] = $request->file('cover')->store('covers', 'public');
+        }
 
         Plan::create($validated);
 
-        return to_route('home')->with('success', 'Rencana berhasil ditambahkan!');
+        return to_route('plans.index')->with('success', 'Rencana berhasil ditambahkan!');
     }
 
     /**
@@ -69,7 +83,7 @@ class PlanController extends Controller
      */
     public function edit(Plan $plan): Response
     {
-        return Inertia::render('Plans/Form', [
+        return Inertia::render('plans/Form', [
             'plan' => $plan,
         ]);
     }
@@ -82,11 +96,20 @@ class PlanController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
+            'cover' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
+
+        if ($request->hasFile('cover')) {
+            // Hapus cover lama jika ada
+            if ($plan->cover) {
+                Storage::disk('public')->delete($plan->cover);
+            }
+            $validated['cover'] = $request->file('cover')->store('covers', 'public');
+        }
 
         $plan->update($validated);
 
-        return to_route('home')->with('success', 'Rencana berhasil diperbarui!');
+        return to_route('plans.index')->with('success', 'Rencana berhasil diperbarui!');
     }
 
     /**
@@ -99,19 +122,7 @@ class PlanController extends Controller
         }
         $plan->delete();
 
-        return to_route('home')->with('success', 'Rencana berhasil dihapus!');
+        return to_route('plans.index')->with('success', 'Rencana berhasil dihapus!');
     }
 
-    /**
-     * Memperbarui cover rencana.
-     */
-    public function updateCover(Request $request, Plan $plan): RedirectResponse
-    {
-        $request->validate(['cover' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048']);
-
-        $path = $request->file('cover')->store('covers', 'public');
-        $plan->update(['cover' => $path]);
-
-        return back()->with('success', 'Cover berhasil diperbarui!');
-    }
 }
