@@ -130,12 +130,12 @@ class PlanController extends Controller
             }
         }
         // Cek jika ada file gambar baru yang diunggah
-        if ($request->hasFile('cover_image')) {
+        if ($request->hasFile('image')) {
             // Hapus gambar lama jika ada sebelum mengunggah yang baru
             if ($plan->cover) {
                 Storage::disk('public')->delete($plan->cover);
             }
-            $validated['cover'] = $request->file('cover_image')->store('covers', 'public');
+            $validated['cover'] = $request->file('image')->store('covers', 'public');
         }
 
         $plan->update($validated);
