@@ -20,7 +20,7 @@ class PlanRequest extends FormRequest
             'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'status' => [
                 'required',
-                Rule::in(['pending', 'in_progress', 'completed'])
+                Rule::in(['todo', 'pending', 'in_progress', 'completed'])
             ],
         ];
     }
@@ -32,7 +32,7 @@ class PlanRequest extends FormRequest
      */
     protected function prepareForValidation()
     {
-        $this->mergeIfMissing(['status' => 'pending']);
+        $this->mergeIfMissing(['status' => 'todo']);
     }
 
     public function messages(): array

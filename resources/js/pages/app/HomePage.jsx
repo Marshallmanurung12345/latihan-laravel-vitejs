@@ -157,6 +157,7 @@ export default function HomePage() {
     return (
         <AppLayout>
             <Head title="Dashboard" />
+<<<<<<< HEAD
             <div className="bg-muted/30">
                 <div className="container mx-auto px-4 py-10 space-y-8">
                     <section className="rounded-3xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white p-8 shadow-xl flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
@@ -172,6 +173,190 @@ export default function HomePage() {
                                     Selamat datang kembali. Pantau progres
                                     rencana dan selesaikan prioritasmu dengan
                                     lebih terstruktur.
+=======
+            <div className="container mx-auto px-4 py-8">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+                    <div>
+                        <h1 className="text-3xl font-bold">
+                            👋 Hai, {auth.user.name}!
+                        </h1>
+                        <p className="text-muted-foreground mt-1">
+                            Selamat datang kembali, mari kita produktif hari
+                            ini.
+                        </p>
+                    </div>
+                    <Link href={route("plans.create")}>
+                        <Button className="bg-blue-600 hover:bg-blue-700 text-white mt-4 md:mt-0">
+                            + Buat Rencana
+                        </Button>
+                    </Link>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div className="bg-white p-6 rounded-lg shadow">
+                        <h3 className="font-semibold text-lg mb-2">
+                            Statistik
+                        </h3>
+                        <ApexCharts
+                            options={chartOptions}
+                            series={chartSeries}
+                            type="donut"
+                            width="100%"
+                        />
+                    </div>
+                    <div className="md:col-span-2 bg-white p-6 rounded-lg shadow flex flex-col justify-center">
+                        <h3 className="font-semibold text-lg mb-4">
+                            Cari & Filter Rencana
+                        </h3>
+                        <form
+                            onSubmit={handleSearch}
+                            className="flex flex-col gap-4"
+                        >
+                            <div className="flex gap-2">
+                                <input
+                                    type="text"
+                                    value={search}
+                                    onChange={(e) => setSearch(e.target.value)}
+                                    placeholder="Cari berdasarkan judul atau konten..."
+                                    className="flex-1 px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                />
+                                <Button type="submit">Cari</Button>
+                            </div>
+                            <div className="flex gap-2 flex-wrap">
+                                <Button
+                                    type="button"
+                                    variant={
+                                        statusFilter === ""
+                                            ? "default"
+                                            : "outline"
+                                    }
+                                    size="sm"
+                                    onClick={() => handleStatusFilter("")}
+                                >
+                                    Semua ({stats.total})
+                                </Button>
+                                <Button
+                                    type="button"
+                                    variant={
+                                        statusFilter === "pending"
+                                            ? "default"
+                                            : "outline"
+                                    }
+                                    size="sm"
+                                    onClick={() =>
+                                        handleStatusFilter("pending")
+                                    }
+                                >
+                                    Tertunda ({stats.pending})
+                                </Button>
+                                <Button
+                                    type="button"
+                                    variant={
+                                        statusFilter === "in_progress"
+                                            ? "default"
+                                            : "outline"
+                                    }
+                                    size="sm"
+                                    onClick={() =>
+                                        handleStatusFilter("in_progress")
+                                    }
+                                >
+                                    Dikerjakan ({stats.in_progress})
+                                </Button>
+                                <Button
+                                    type="button"
+                                    variant={
+                                        statusFilter === "completed"
+                                            ? "default"
+                                            : "outline"
+                                    }
+                                    size="sm"
+                                    onClick={() =>
+                                        handleStatusFilter("completed")
+                                    }
+                                >
+                                    Selesai ({stats.completed})
+                                </Button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div className="bg-white p-6 rounded-lg shadow">
+                    <div className="mb-6">
+                        <h2 className="text-2xl font-bold">Daftar Rencanamu</h2>
+                    </div>
+                    <div className="space-y-4">
+                        {plans.data && plans.data.length > 0 ? (
+                            plans.data.map((plan) => (
+                                <div
+                                    key={plan.id}
+                                    className="border p-4 rounded-md hover:bg-gray-50 transition"
+                                >
+                                    <div className="flex justify-between items-start gap-4">
+                                        <div className="flex-1">
+                                            <div className="flex items-center gap-3 mb-2">
+                                                <h4 className="font-bold text-lg">
+                                                    {plan.title}
+                                                </h4>
+                                                {getStatusBadge(plan.status)}
+                                            </div>
+                                            <p className="text-sm text-gray-500 mt-1 line-clamp-2">
+                                                {plan.content}
+                                            </p>
+                                            <p className="text-xs text-gray-400 mt-2">
+                                                Dibuat pada:{" "}
+                                                {new Date(
+                                                    plan.created_at
+                                                ).toLocaleDateString("id-ID")}
+                                            </p>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <Link
+                                                href={route(
+                                                    "plans.show",
+                                                    plan.id
+                                                )}
+                                            >
+                                                <Button
+                                                    variant="default"
+                                                    size="sm"
+                                                >
+                                                    Detail
+                                                </Button>
+                                            </Link>
+                                            <Link
+                                                href={route(
+                                                    "plans.edit",
+                                                    plan.id
+                                                )}
+                                            >
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                >
+                                                    Ubah
+                                                </Button>
+                                            </Link>
+                                            <Button
+                                                variant="destructive"
+                                                size="sm"
+                                                onClick={() =>
+                                                    handleDelete(plan)
+                                                }
+                                            >
+                                                Hapus
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))
+                        ) : (
+                            <div className="text-center py-12">
+                                <p className="text-gray-500 mb-4">
+                                    Belum ada rencana. Mulai buat rencana
+                                    pertama Anda!
+>>>>>>> dd1368a0f65310aff43ce7eca78d530673d7ae49
                                 </p>
                             </div>
                             <div className="flex flex-wrap gap-4">

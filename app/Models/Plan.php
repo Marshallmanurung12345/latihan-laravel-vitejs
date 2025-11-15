@@ -24,6 +24,7 @@ class Plan extends Model
 
     // Status constants
     const STATUS_PENDING = 'pending';
+    const STATUS_TODO = 'todo';
     const STATUS_IN_PROGRESS = 'in_progress';
     const STATUS_COMPLETED = 'completed';
 
@@ -67,5 +68,10 @@ class Plan extends Model
     public function scopeCompleted($query)
     {
         return $query->where('status', self::STATUS_COMPLETED);
+    }
+
+    public function scopeTodo($query)
+    {
+        return $query->where('status', self::STATUS_TODO);
     }
 }
