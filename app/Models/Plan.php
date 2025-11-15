@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Storage;
 
 class Plan extends Model
@@ -15,7 +16,7 @@ class Plan extends Model
      *
      * @var array<int, string>
      */
-    protected $fillable = ['title', 'content', 'cover'];
+    protected $fillable = ['title', 'content', 'cover', 'user_id'];
 
     /**
      * The accessors to append to the model's array form.
@@ -30,5 +31,13 @@ class Plan extends Model
     public function getCoverImageUrlAttribute(): ?string
     {
         return $this->cover ? Storage::url($this->cover) : null;
+    }
+
+    /**
+     * Mendefinisikan relasi "belongsTo" ke model User.
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 }

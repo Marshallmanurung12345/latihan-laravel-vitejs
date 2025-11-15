@@ -2,57 +2,65 @@ import React from "react";
 import { Head, Link } from "@inertiajs/react";
 import AppLayout from "@/layouts/AppLayout";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+    Card,
+    CardContent,
+    CardHeader,
+    CardTitle,
+    CardFooter,
+} from "@/components/ui/card";
 import { ArrowLeft } from "lucide-react";
 
-export default function ShowPage({ plan }) {
+export default function Show({ plan }) {
+    // Format tanggal ke format yang mudah dibaca (e.g., "17 Agustus 2024")
+    const formattedDate = new Date(plan.data.created_at).toLocaleDateString(
+        "id-ID",
+        {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+        }
+    );
+
     return (
         <AppLayout>
-            <Head title={`Detail Rencana: ${plan.title}`} />
+            <Head title={plan.data.title} />
 
             <div className="container mx-auto px-4 py-8">
                 <div className="max-w-3xl mx-auto">
                     <div className="mb-6">
-                        <Link href={route("home")}>
+                        <Link href={route("plans.index")}>
                             <Button variant="outline">
-                                <ArrowLeft className="w-4 h-4 mr-2" />
-                                Kembali ke Dashboard
+                                <ArrowLeft className="mr-2 h-4 w-4" />
+                                Kembali ke Daftar
                             </Button>
                         </Link>
                     </div>
 
                     <Card>
                         <CardHeader>
-                            {plan.cover_image_url && (
+                            {plan.data.cover_image_url && (
                                 <img
-                                    src={plan.cover_image_url}
-                                    alt={`Sampul untuk ${plan.title}`}
+                                    src={plan.data.cover_image_url}
+                                    alt={`Sampul untuk ${plan.data.title}`}
                                     className="w-full h-64 object-cover rounded-t-lg mb-4"
                                 />
                             )}
                             <CardTitle className="text-3xl font-bold">
-                                {plan.title}
+                                {plan.data.title}
                             </CardTitle>
-                            <p className="text-sm text-muted-foreground pt-2">
-                                Dibuat pada:{" "}
-                                {new Date(plan.created_at).toLocaleDateString(
-                                    "id-ID",
-                                    {
-                                        year: "numeric",
-                                        month: "long",
-                                        day: "numeric",
-                                    }
-                                )}
+                            <p className="text-sm text-muted-foreground">
+                                Dibuat pada: {formattedDate}
                             </p>
                         </CardHeader>
                         <CardContent>
-                            <div className="prose max-w-none whitespace-pre-wrap">
-                                <div
-                                    dangerouslySetInnerHTML={{
-                                        __html: plan.content,
-                                    }}
-                                />
-                            </div>
+                            {/* Tampilkan konten sebagai HTML jika mengandung format, atau sebagai teks biasa */}
+                            <div
+                                className="prose max-w-none"
+                                dangerouslySetInnerHTML={{
+                                    __html: plan.data.content,
+                                }}
+                            />
                         </CardContent>
                     </Card>
                 </div>

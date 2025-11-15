@@ -153,18 +153,12 @@ export default function FormPage({ plan }) {
                                 </Field>
 
                                 <div className="flex items-center justify-end space-x-4 pt-4">
-                                    <Link href={route("home")}>
-                                        <Button
-                                            type="button"
-                                            variant="outline"
-                                        >
+                                    <Link href={route("plans.index")}>
+                                        <Button type="button" variant="outline">
                                             Batal
                                         </Button>
                                     </Link>
-                                    <Button
-                                        type="submit"
-                                        disabled={processing}
-                                    >
+                                    <Button type="submit" disabled={processing}>
                                         {processing
                                             ? "Menyimpan..."
                                             : isEditing

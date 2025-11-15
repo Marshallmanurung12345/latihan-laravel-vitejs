@@ -5,6 +5,7 @@ import { Head, Link, router, usePage } from "@inertiajs/react";
 import ApexCharts from "react-apexcharts";
 import Pagination from "@/components/Pagination";
 import Swal from "sweetalert2";
+import { cn } from "@/lib/utils";
 
 export default function HomePage() {
     const { auth, plans, stats, filters, flash } = usePage().props;
@@ -126,21 +127,36 @@ export default function HomePage() {
 
                 {/* Daftar Rencana */}
                 <div className="bg-white p-6 rounded-lg shadow">
-                    <h2 className="text-2xl font-bold mb-6">
-                        Daftar Rencanamu
-                    </h2>
+                    <div className="mb-6">
+                        <h2 className="text-2xl font-bold">Daftar Rencanamu</h2>
+                    </div>
                     <div className="space-y-4">
                         {plans.data && plans.data.length > 0 ? (
                             plans.data.map((plan) => (
                                 <div
                                     key={plan.id}
-                                    className="border p-4 rounded-md flex justify-between items-center hover:bg-gray-50 transition"
+                                    className={cn(
+                                        "border p-4 rounded-md flex justify-between items-center hover:bg-gray-50 transition",
+                                        plan.completed_at && "bg-gray-100"
+                                    )}
                                 >
                                     <div className="flex-1">
-                                        <h4 className="font-bold text-lg">
+                                        <h4
+                                            className={cn(
+                                                "font-bold text-lg",
+                                                plan.completed_at &&
+                                                    "line-through text-gray-500"
+                                            )}
+                                        >
                                             {plan.title}
                                         </h4>
-                                        <p className="text-sm text-gray-500 mt-1 line-clamp-2">
+                                        <p
+                                            className={cn(
+                                                "text-sm text-gray-500 mt-1 line-clamp-2",
+                                                plan.completed_at &&
+                                                    "line-through"
+                                            )}
+                                        >
                                             {plan.content}
                                         </p>
                                         <p className="text-xs text-gray-400 mt-2">
