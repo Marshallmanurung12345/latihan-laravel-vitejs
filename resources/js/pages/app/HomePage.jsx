@@ -132,6 +132,10 @@ export default function HomePage() {
                 onError: () => {
                     // Jika gagal, kembalikan ke status semula
                     plan.status = originalStatus;
+                    setLocalStats(originalStats); // Kembalikan juga statistik
+                },
+                onSuccess: () => {
+                    // Jangan lakukan apa-apa, karena kita sudah memperbarui stats secara optimis.
                 },
             }
         );
