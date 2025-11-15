@@ -128,11 +128,11 @@ export default function Home({ plans, filters, stats }) {
     ];
 
     return (
-        <div className="relative min-h-screen overflow-hidden bg-slate-950">
+        <div className="relative min-h-screen overflow-hidden bg-slate-900">
             <Head title="Dashboard Rencana" />
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(99,102,241,0.35),transparent_55%),radial-gradient(circle_at_bottom,_rgba(14,165,233,0.25),transparent_60%)]" />
-            <div className="absolute inset-y-0 -right-24 hidden lg:block h-[500px] w-[500px] rounded-full bg-gradient-to-br from-indigo-500/30 to-fuchsia-500/20 blur-3xl" />
-            <div className="absolute inset-y-0 -left-32 hidden lg:block h-[420px] w-[420px] rounded-full bg-gradient-to-tr from-sky-500/30 to-purple-500/20 blur-3xl" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(148,163,184,0.35),transparent_55%),linear-gradient(135deg,_rgba(15,23,42,0.95),_rgba(30,41,59,0.95))]" />
+            <div className="absolute inset-y-0 -right-24 hidden lg:block h-[460px] w-[460px] rounded-full bg-gradient-to-br from-indigo-300/35 to-fuchsia-200/20 blur-[140px]" />
+            <div className="absolute inset-y-0 -left-24 hidden lg:block h-[360px] w-[360px] rounded-full bg-gradient-to-tr from-sky-200/30 to-purple-200/15 blur-[140px]" />
 
             <FlashAlert
                 text={alert?.message}
@@ -175,8 +175,8 @@ export default function Home({ plans, filters, stats }) {
                     </div>
                 </section>
 
-                <section className="mx-auto mt-10 grid max-w-6xl gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-                    <div className="rounded-3xl border border-white/15 bg-white/5 p-6 shadow-2xl">
+                <section className="mx-auto mt-10 grid max-w-6xl gap-6 lg:grid-cols-[1.15fr_0.85fr]">
+                    <div className="rounded-3xl border border-white/12 bg-white/6 p-6 shadow-2xl">
                         <h2 className="text-lg font-semibold">
                             Statistik 7 hari terakhir
                         </h2>
@@ -190,7 +190,7 @@ export default function Home({ plans, filters, stats }) {
                             height={320}
                         />
                     </div>
-                    <div className="rounded-3xl border border-white/15 bg-white/5 p-6 shadow-2xl space-y-5">
+                    <div className="rounded-3xl border border-white/12 bg-white/6 p-6 shadow-2xl space-y-5">
                         <form onSubmit={handleSearch} className="space-y-4">
                             <label className="text-sm font-semibold text-slate-100">
                                 Cari rencana
@@ -247,7 +247,7 @@ export default function Home({ plans, filters, stats }) {
                         </Link>
                     </div>
 
-                    <div className="rounded-3xl border border-white/15 bg-white text-slate-900 shadow-2xl">
+                    <div className="rounded-3xl border border-white/12 bg-white text-slate-900 shadow-2xl">
                         <div className="overflow-x-auto rounded-3xl">
                             <table className="w-full whitespace-nowrap text-left">
                                 <thead className="bg-slate-100/80 text-xs font-semibold uppercase tracking-wider text-slate-600">
