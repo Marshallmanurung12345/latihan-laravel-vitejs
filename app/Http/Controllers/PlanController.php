@@ -26,11 +26,7 @@ class PlanController extends Controller
                     ->orWhere('content', 'like', "%{$search}%");
             })
             ->when($request->input('status'), function ($query, $status) {
-                if ($status === 'done') {
-                    $query->whereNotNull('completed_at');
-                } elseif ($status === 'pending') {
-                    $query->whereNull('completed_at');
-                }
+                $query->where('status', $status);
             })
             ->latest();
 
@@ -38,8 +34,9 @@ class PlanController extends Controller
         $baseStatsQuery = Plan::where('user_id', auth()->id());
         $stats = [
             'total' => $baseStatsQuery->clone()->count(),
-            'done' => $baseStatsQuery->clone()->whereNotNull('completed_at')->count(),
-            'pending' => $baseStatsQuery->clone()->whereNull('completed_at')->count(),
+            'completed' => $baseStatsQuery->clone()->completed()->count(),
+            'in_progress' => $baseStatsQuery->clone()->inProgress()->count(),
+            'pending' => $baseStatsQuery->clone()->pending()->count(),
         ];
 
         return Inertia::render('app/HomePage', [
@@ -78,7 +75,11 @@ class PlanController extends Controller
         $validated = $request->validated();
 
         $validated['user_id'] = auth()->id(); // Tambahkan ID pengguna yang sedang login
-        $validated['completed_at'] = !empty($validated['is_completed']) ? now() : null;
+
+        // Jika status adalah 'completed', set waktu sekarang.
+        if (isset($validated['status']) && $validated['status'] === 'completed') {
+            $validated['completed_at'] = now();
+        }
 
         if ($request->hasFile('cover_image')) {
             $validated['cover'] = $request->file('cover_image')->store('covers', 'public');
@@ -106,9 +107,16 @@ class PlanController extends Controller
     {
         $validated = $request->validated();
 
-        // Jika is_completed dicentang, set waktu sekarang. Jika tidak, set null.
-        $validated['completed_at'] = !empty($validated['is_completed']) ? now() : null;
-
+        // Secara otomatis mengatur atau menghapus `completed_at` hanya jika status berubah.
+        if (isset($validated['status'])) {
+            // Jika status diubah menjadi 'completed' dan sebelumnya BUKAN 'completed'.
+            if ($validated['status'] === 'completed' && $plan->status !== 'completed') {
+                $validated['completed_at'] = now();
+            // Jika status diubah DARI 'completed' ke status lain.
+            } elseif ($validated['status'] !== 'completed' && $plan->status === 'completed') {
+                $validated['completed_at'] = null;
+            }
+        }
         // Cek jika ada file gambar baru yang diunggah
         if ($request->hasFile('cover_image')) {
             // Hapus gambar lama jika ada sebelum mengunggah yang baru

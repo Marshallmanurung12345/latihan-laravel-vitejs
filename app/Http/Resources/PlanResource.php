@@ -7,20 +7,17 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class PlanResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
     public function toArray(Request $request): array
     {
         return [
             'id' => $this->id,
             'title' => $this->title,
             'content' => $this->content,
-            'cover_image_url' => $this->cover_image_url, // Pastikan atribut ini ada
-            'created_at' => $this->created_at,
-            'completed_at' => $this->completed_at,
+            'status' => $this->status,
+            'cover_image_url' => $this->cover_image_url,
+            'completed_at' => $this->completed_at?->toIso8601String(),
+            'created_at' => $this->created_at->toIso8601String(),
+            'updated_at' => $this->updated_at->toIso8601String(),
             'user' => new UserResource($this->whenLoaded('user')),
         ];
     }
