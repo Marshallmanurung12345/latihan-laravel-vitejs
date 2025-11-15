@@ -32,7 +32,7 @@ class PlanRequest extends FormRequest
      */
     protected function prepareForValidation()
     {
-        $this->mergeIfMissing(['status' => 'todo']);
+        $this->mergeIfMissing(['status' => 'pending']);
     }
 
     public function messages(): array

@@ -38,10 +38,10 @@ class PlanController extends Controller
             ->groupBy('status')
             ->pluck('count', 'status');
 
+        $todoCount = $statusCounts->get(Plan::STATUS_TODO, 0);
         $stats = [
             'total' => $statusCounts->sum(),
-            'todo' => $statusCounts->get(Plan::STATUS_TODO, 0),
-            'pending' => $statusCounts->get(Plan::STATUS_PENDING, 0),
+            'pending' => $statusCounts->get(Plan::STATUS_PENDING, 0) + $todoCount,
             'in_progress' => $statusCounts->get(Plan::STATUS_IN_PROGRESS, 0),
             'completed' => $statusCounts->get(Plan::STATUS_COMPLETED, 0),
         ];

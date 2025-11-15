@@ -18,21 +18,27 @@ import {
 } from "@/components/ui/card";
 
 const STATUS_OPTIONS = [
-    { value: "todo", label: "Belum dimulai" },
     { value: "pending", label: "Tertunda" },
     { value: "in_progress", label: "Sedang dikerjakan" },
     { value: "completed", label: "Selesai" },
 ];
+
+const normalizeStatus = (value) => {
+    if (value === "todo") return "pending";
+    return value || "pending";
+};
 
 export default function FormPage({ plan }) {
     const isEditing = !!plan;
     const fileInputRef = useRef();
     const [previewUrl, setPreviewUrl] = useState(plan?.cover_image_url || null);
 
+    const initialStatus = normalizeStatus(plan?.status);
+
     const { data, setData, post, processing, errors } = useForm({
         title: plan?.title || "",
         content: plan?.content || "",
-        status: plan?.status || "todo",
+        status: initialStatus,
         cover_image: null,
         _method: isEditing ? "PUT" : "POST",
     });
@@ -42,7 +48,7 @@ export default function FormPage({ plan }) {
             ...prev,
             title: plan?.title || "",
             content: plan?.content || "",
-            status: plan?.status || "todo",
+            status: normalizeStatus(plan?.status),
             cover_image: null,
             _method: isEditing ? "PUT" : "POST",
         }));

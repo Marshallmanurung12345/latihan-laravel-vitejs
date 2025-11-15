@@ -16,15 +16,9 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 
-const STATUS_ORDER = ["todo", "pending", "in_progress", "completed"];
+const STATUS_ORDER = ["pending", "in_progress", "completed"];
 
 const STATUS_META = {
-    todo: {
-        label: "Belum Dimulai",
-        className: "bg-slate-100 text-slate-800 border-slate-300",
-        icon: CircleDot,
-        color: "#94A3B8",
-    },
     pending: {
         label: "Tertunda",
         className: "bg-yellow-100 text-yellow-800 border-yellow-300",
@@ -47,16 +41,21 @@ const STATUS_META = {
 
 const DEFAULT_STATS = {
     total: 0,
-    todo: 0,
     pending: 0,
     in_progress: 0,
     completed: 0,
 };
 
-const buildStats = (stats = {}) => ({
-    ...DEFAULT_STATS,
-    ...stats,
-});
+const buildStats = (stats = {}) => {
+    const merged = { ...DEFAULT_STATS, ...stats };
+    if (stats.todo) {
+        merged.pending += stats.todo;
+    }
+    return merged;
+};
+
+const normalizeDashboardStatus = (status) =>
+    status === "todo" ? "pending" : status;
 
 const adjustStatsCounts = (prevStats, fromStatus, toStatus) => {
     const next = { ...prevStats };

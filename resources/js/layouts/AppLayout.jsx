@@ -31,7 +31,7 @@ export default function AppLayout({ children }) {
             {/* Footer */}
             <footer className="border-t bg-card py-6">
                 <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-                    &copy; 2025 Delcom Labs. All rights reserved.
+                    Marshall Manurung &middot; NIM 11S23021
                 </div>
             </footer>
         </div>
