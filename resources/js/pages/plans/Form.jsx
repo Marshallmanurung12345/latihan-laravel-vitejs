@@ -39,35 +39,20 @@ export default function FormPage({ plan }) {
         title: plan?.title || "",
         content: plan?.content || "",
         status: initialStatus,
-        cover_image: null,
+        image: null, // Menyesuaikan nama field dengan controller
         _method: isEditing ? "PUT" : "POST",
     });
-
-    useEffect(() => {
-        setData((prev) => ({
-            ...prev,
-            title: plan?.title || "",
-            content: plan?.content || "",
-            status: normalizeStatus(plan?.status),
-            cover_image: null,
-            _method: isEditing ? "PUT" : "POST",
-        }));
-        setPreviewUrl(plan?.cover_image_url || null);
-        if (fileInputRef.current) {
-            fileInputRef.current.value = "";
-        }
-    }, [isEditing, plan?.id]);
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         if (file) {
-            setData("cover_image", file);
+            setData("image", file);
             setPreviewUrl(URL.createObjectURL(file));
         }
     };
 
     const clearImage = () => {
-        setData("cover_image", null);
+        setData("image", null);
         setPreviewUrl(null);
         if (fileInputRef.current) {
             fileInputRef.current.value = "";
@@ -76,7 +61,10 @@ export default function FormPage({ plan }) {
 
     function handleSubmit(e) {
         e.preventDefault();
-        const options = { preserveScroll: true };
+        const options = {
+            preserveScroll: true,
+            forceFormData: true, // Memaksa form dikirim sebagai multipart/form-data
+        };
         if (isEditing) {
             post(route("plans.update", plan.id), options);
         } else {
@@ -210,7 +198,7 @@ export default function FormPage({ plan }) {
                                     </Field>
 
                                     <Field>
-                                        <FieldLabel htmlFor="cover_image">
+                                        <FieldLabel htmlFor="image">
                                             Foto Sampul (opsional)
                                         </FieldLabel>
                                         <div className="rounded-2xl border border-dashed border-border bg-card/40 p-4">
@@ -244,17 +232,17 @@ export default function FormPage({ plan }) {
                                             )}
                                             <div className="mt-4">
                                                 <Input
+                                                    id="image"
                                                     type="file"
-                                                    id="cover_image"
                                                     onChange={handleFileChange}
                                                     ref={fileInputRef}
                                                     aria-invalid={
-                                                        !!errors.cover_image
+                                                        !!errors.image
                                                     }
                                                 />
-                                                {errors.cover_image && (
-                                                    <FieldDescription className="text-destructive">
-                                                        {errors.cover_image}
+                                                {errors.image && (
+                                                    <FieldDescription className="text-destructive mt-2">
+                                                        {errors.image}
                                                     </FieldDescription>
                                                 )}
                                             </div>
