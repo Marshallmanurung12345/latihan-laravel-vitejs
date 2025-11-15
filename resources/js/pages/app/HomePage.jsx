@@ -140,17 +140,27 @@ export default function HomePage() {
         chart: {
             type: "donut",
         },
+        labels: ["Tertunda", "Sedang Dikerjakan", "Selesai"],
+        colors: ["#F59E0B", "#3B82F6", "#10B981"], // Warna untuk Tertunda, Dikerjakan, Selesai
         labels: ["Tertunda", "Selesai"],
-        colors: ["#F59E0B", "#10B981"],
+        colors: ["#F59E0B", "#10B981"], // Warna untuk Tertunda, Selesai
         legend: {
             position: "bottom",
         },
     };
-    const chartSeries = [stats.pending, stats.completed];
+    const chartSeries = [
+        stats.pending ?? 0,
+        stats.in_progress ?? 0,
+        stats.completed ?? 0,
+    ];
 
     const statusButtons = [
         { value: "", label: `Semua (${stats.total ?? 0})` },
         { value: "pending", label: `Tertunda (${stats.pending ?? 0})` },
+        {
+            value: "in_progress",
+            label: `Dikerjakan (${stats.in_progress ?? 0})`,
+        },
         { value: "completed", label: `Selesai (${stats.completed ?? 0})` },
     ];
 
