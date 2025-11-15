@@ -1,5 +1,5 @@
 import { Head, Link, router, usePage } from "@inertiajs/react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import ReactApexChart from "react-apexcharts";
 import {
     PencilIcon,
@@ -9,7 +9,23 @@ import {
 } from "@heroicons/react/24/solid";
 import FlashAlert from "@/components/FlashAlert";
 
-// Komponen untuk Pagination Links
+const heroHighlights = [
+    {
+        title: "Statistik realtime",
+        description:
+            "Setiap perubahan langsung memperbarui grafik dan ringkasan.",
+    },
+    {
+        title: "Aksi instan",
+        description: "Ubah, tandai selesai, atau hapus dalam satu klik.",
+    },
+    {
+        title: "Fokus terkurasi",
+        description:
+            "Filter rencana sesuai prioritas dan temukan yang penting.",
+    },
+];
+
 const Pagination = ({ links }) => {
     return (
         <div className="flex flex-wrap -mb-1">
@@ -18,7 +34,7 @@ const Pagination = ({ links }) => {
                     return (
                         <span
                             key={key}
-                            className="mr-1 mb-1 px-4 py-3 text-sm leading-4 text-gray-400 border rounded"
+                            className="mr-1 mb-1 px-4 py-3 text-sm leading-4 text-white/40 border border-white/20 rounded"
                             dangerouslySetInnerHTML={{ __html: link.label }}
                         />
                     );
@@ -26,10 +42,10 @@ const Pagination = ({ links }) => {
                 return (
                     <Link
                         key={key}
-                        className={`mr-1 mb-1 px-4 py-3 text-sm leading-4 border rounded-md transition-colors duration-200 hover:bg-indigo-500 hover:text-white focus:border-indigo-500 focus:text-indigo-500 ${
+                        className={`mr-1 mb-1 px-4 py-3 text-sm leading-4 border rounded-md transition-colors duration-200 ${
                             link.active
-                                ? "bg-indigo-500 text-white"
-                                : "bg-white"
+                                ? "bg-white text-slate-900"
+                                : "bg-white/5 text-white/80 hover:bg-white/10"
                         }`}
                         href={link.url}
                         dangerouslySetInnerHTML={{ __html: link.label }}
@@ -54,13 +70,11 @@ export default function Home({ plans, filters, stats }) {
         }
     }, [flash]);
 
-    // Fungsi untuk menangani pencarian
     const handleSearch = (e) => {
         e.preventDefault();
         router.get(route("home"), { search }, { preserveState: true });
     };
 
-    // Fungsi untuk menghapus data dengan konfirmasi
     const handleDelete = (plan) => {
         const confirmed = window.confirm(
             `Anda akan menghapus rencana "${plan.title}". Tindakan ini tidak dapat dibatalkan!`
@@ -71,128 +85,232 @@ export default function Home({ plans, filters, stats }) {
         }
     };
 
-    // Konfigurasi untuk ApexCharts
-    const chartOptions = {
-        chart: { id: "basic-bar" },
-        xaxis: { categories: ["Total", "Selesai", "Tertunda"] },
-    };
-    const chartSeries = [
+    const chartSeries = useMemo(
+        () => [
+            {
+                name: "Jumlah Rencana",
+                data: [
+                    stats.total ?? plans.data.length,
+                    stats.done ?? 0,
+                    stats.pending ?? 0,
+                ],
+            },
+        ],
+        [stats, plans.data.length]
+    );
+
+    const chartOptions = useMemo(
+        () => ({
+            chart: { id: "basic-bar", foreColor: "#e2e8f0" },
+            xaxis: { categories: ["Total", "Selesai", "Tertunda"] },
+            grid: { borderColor: "rgba(255,255,255,0.1)" },
+            colors: ["#38bdf8"],
+        }),
+        []
+    );
+
+    const summaryCards = [
         {
-            name: "Jumlah Rencana",
-            data: [stats.total, stats.done, stats.pending],
+            label: "Total Rencana",
+            value: stats.total ?? plans.data.length,
+            caption: "Semua rencana aktif",
+        },
+        {
+            label: "Selesai",
+            value: stats.done ?? 0,
+            caption: "Tuntas tanpa tertinggal",
+        },
+        {
+            label: "Tertunda",
+            value: stats.pending ?? 0,
+            caption: "Menunggu aksi berikutnya",
         },
     ];
 
     return (
-        <div className="min-h-screen bg-gray-100">
+        <div className="relative min-h-screen overflow-hidden bg-slate-950">
+            <Head title="Dashboard Rencana" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(99,102,241,0.35),transparent_55%),radial-gradient(circle_at_bottom,_rgba(14,165,233,0.25),transparent_60%)]" />
+            <div className="absolute inset-y-0 -right-24 hidden lg:block h-[500px] w-[500px] rounded-full bg-gradient-to-br from-indigo-500/30 to-fuchsia-500/20 blur-3xl" />
+            <div className="absolute inset-y-0 -left-32 hidden lg:block h-[420px] w-[420px] rounded-full bg-gradient-to-tr from-sky-500/30 to-purple-500/20 blur-3xl" />
+
             <FlashAlert
                 text={alert?.message}
                 variant={alert?.variant}
                 onFinish={() => setAlert(null)}
             />
-            <div className="container mx-auto p-4 md:p-8">
-                <Head title="Dashboard Rencana" />
-                <h1 className="text-3xl font-bold mb-6">Dashboard Rencana</h1>
 
-                {/* Statistik ApexCharts */}
-                <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-                    <h2 className="text-xl font-semibold mb-4">Statistik</h2>
-                    <ReactApexChart
-                        options={chartOptions}
-                        series={chartSeries}
-                        type="bar"
-                        height={350}
-                    />
-                </div>
+            <div className="relative z-10 px-4 py-10 text-white">
+                <section className="mx-auto max-w-5xl space-y-6">
+                    <div className="space-y-3 text-center md:text-left">
+                        <p className="text-sm uppercase tracking-[0.3em] text-slate-200">
+                            Dashboard MarshallTodos
+                        </p>
+                        <h1 className="text-4xl font-semibold leading-tight">
+                            Rencanakan hari ini, raih target besok
+                        </h1>
+                        <p className="text-base text-slate-200/80">
+                            Pantau statistik, kelola catatan, dan tuntaskan
+                            pekerjaan dengan gaya baru yang seragam di seluruh
+                            aplikasi.
+                        </p>
+                    </div>
+                    <div className="grid gap-4 sm:grid-cols-3">
+                        {summaryCards.map((card) => (
+                            <div
+                                key={card.label}
+                                className="rounded-3xl border border-white/20 bg-white/10 p-5 shadow-xl"
+                            >
+                                <p className="text-xs uppercase tracking-wide text-slate-200">
+                                    {card.label}
+                                </p>
+                                <p className="mt-2 text-3xl font-semibold">
+                                    {card.value}
+                                </p>
+                                <p className="text-sm text-slate-200/80">
+                                    {card.caption}
+                                </p>
+                            </div>
+                        ))}
+                    </div>
+                </section>
 
-                <div className="flex justify-between items-center mb-6">
-                    {/* Form Pencarian */}
-                    <form
-                        onSubmit={handleSearch}
-                        className="relative w-full max-w-md"
-                    >
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <SearchIcon className="h-5 w-5 text-gray-400" />
-                        </div>
-                        <input
-                            type="text"
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                            placeholder="Cari rencana..."
-                            className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                <section className="mx-auto mt-10 grid max-w-6xl gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+                    <div className="rounded-3xl border border-white/15 bg-white/5 p-6 shadow-2xl">
+                        <h2 className="text-lg font-semibold">
+                            Statistik 7 hari terakhir
+                        </h2>
+                        <p className="text-sm text-slate-200/80">
+                            Perbandingan total rencana, selesai, dan tertunda.
+                        </p>
+                        <ReactApexChart
+                            options={chartOptions}
+                            series={chartSeries}
+                            type="bar"
+                            height={320}
                         />
-                    </form>
-                    {/* Tombol Tambah Data */}
-                    <Link
-                        href={route("plans.create")}
-                        className="inline-flex items-center justify-center ml-4 px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200 whitespace-nowrap"
-                    >
-                        <PlusIcon className="w-5 h-5 mr-2 -ml-1" />
-                        Tambah Rencana
-                    </Link>
-                </div>
-
-                {/* Tabel Data */}
-                <div className="bg-white rounded-lg shadow-md overflow-x-auto">
-                    <table className="w-full whitespace-nowrap">
-                        <thead className="bg-gray-50">
-                            <tr className="text-left font-semibold text-sm text-gray-600 uppercase tracking-wider">
-                                <th className="px-6 py-3">Judul</th>
-                                <th className="px-6 py-3 text-right">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-200">
-                            {plans.data.map((plan) => (
-                                <tr
-                                    key={plan.id}
-                                    className="hover:bg-gray-50 focus-within:bg-gray-50 transition-colors duration-150"
+                    </div>
+                    <div className="rounded-3xl border border-white/15 bg-white/5 p-6 shadow-2xl space-y-5">
+                        <form onSubmit={handleSearch} className="space-y-4">
+                            <label className="text-sm font-semibold text-slate-100">
+                                Cari rencana
+                            </label>
+                            <div className="relative">
+                                <SearchIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/50" />
+                                <input
+                                    type="text"
+                                    value={search}
+                                    onChange={(e) => setSearch(e.target.value)}
+                                    placeholder="Cth: presentasi produk"
+                                    className="w-full rounded-2xl border border-white/20 bg-white/10 py-3 pl-10 pr-4 text-sm placeholder-white/50 focus:border-white focus:outline-none"
+                                />
+                            </div>
+                            <button
+                                type="submit"
+                                className="inline-flex w-full items-center justify-center rounded-2xl bg-white/90 px-4 py-3 text-sm font-semibold text-slate-900 transition hover:bg-white"
+                            >
+                                Cari sekarang
+                            </button>
+                        </form>
+                        <div className="space-y-3 text-sm text-slate-200/80">
+                            {heroHighlights.map((item) => (
+                                <div
+                                    key={item.title}
+                                    className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
                                 >
-                                    <td className="border-t px-6 py-4">
-                                        {plan.title}
-                                    </td>
-                                    <td className="border-t px-6 py-4">
-                                        <div className="flex items-center justify-end space-x-4">
-                                            <Link
-                                                href={route(
-                                                    "plans.edit",
-                                                    plan.id
-                                                )}
-                                                className="inline-flex items-center text-indigo-600 hover:text-indigo-900 transition-colors duration-200"
-                                            >
-                                                <PencilIcon className="w-4 h-4 mr-1" />
-                                                Ubah
-                                            </Link>
-                                            <button
-                                                onClick={() =>
-                                                    handleDelete(plan)
-                                                }
-                                                className="inline-flex items-center text-red-600 hover:text-red-900 transition-colors duration-200"
-                                            >
-                                                <TrashIcon className="w-4 h-4 mr-1" />
-                                                Hapus
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
+                                    <p className="text-white font-medium">
+                                        {item.title}
+                                    </p>
+                                    <p>{item.description}</p>
+                                </div>
                             ))}
-                            {plans.data.length === 0 && (
-                                <tr>
-                                    <td
-                                        className="border-t px-6 py-4"
-                                        colSpan="2"
-                                    >
-                                        Tidak ada data rencana ditemukan.
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
-                </div>
+                        </div>
+                    </div>
+                </section>
 
-                {/* Pagination */}
-                <div className="mt-6">
-                    <Pagination links={plans.links} />
-                </div>
+                <section className="mx-auto mt-10 max-w-6xl space-y-6">
+                    <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                        <div>
+                            <h2 className="text-2xl font-semibold">
+                                Daftar Rencana
+                            </h2>
+                            <p className="text-sm text-slate-200/80">
+                                Kelola judul, status, serta tindakan hapus atau
+                                ubah.
+                            </p>
+                        </div>
+                        <Link
+                            href={route("plans.create")}
+                            className="inline-flex items-center justify-center rounded-2xl border border-white/20 bg-white/90 px-5 py-2.5 text-sm font-semibold text-slate-900 transition hover:bg-white"
+                        >
+                            <PlusIcon className="mr-2 h-4 w-4" /> Tambah Rencana
+                        </Link>
+                    </div>
+
+                    <div className="rounded-3xl border border-white/15 bg-white text-slate-900 shadow-2xl">
+                        <div className="overflow-x-auto rounded-3xl">
+                            <table className="w-full whitespace-nowrap text-left">
+                                <thead className="bg-slate-100/80 text-xs font-semibold uppercase tracking-wider text-slate-600">
+                                    <tr>
+                                        <th className="px-6 py-3">Judul</th>
+                                        <th className="px-6 py-3 text-right">
+                                            Aksi
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-100 text-sm">
+                                    {plans.data.map((plan) => (
+                                        <tr
+                                            key={plan.id}
+                                            className="hover:bg-slate-50"
+                                        >
+                                            <td className="px-6 py-4 font-medium text-slate-900">
+                                                {plan.title}
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <div className="flex items-center justify-end space-x-4 text-xs font-semibold">
+                                                    <Link
+                                                        href={route(
+                                                            "plans.edit",
+                                                            plan.id
+                                                        )}
+                                                        className="inline-flex items-center text-indigo-600 hover:text-indigo-900"
+                                                    >
+                                                        <PencilIcon className="mr-1 h-4 w-4" />{" "}
+                                                        Ubah
+                                                    </Link>
+                                                    <button
+                                                        onClick={() =>
+                                                            handleDelete(plan)
+                                                        }
+                                                        className="inline-flex items-center text-rose-600 hover:text-rose-800"
+                                                    >
+                                                        <TrashIcon className="mr-1 h-4 w-4" />{" "}
+                                                        Hapus
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                    {plans.data.length === 0 && (
+                                        <tr>
+                                            <td
+                                                colSpan="2"
+                                                className="px-6 py-8 text-center text-slate-500"
+                                            >
+                                                Tidak ada data rencana
+                                                ditemukan.
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div className="border-t border-slate-100 px-6 py-4">
+                            <Pagination links={plans.links} />
+                        </div>
+                    </div>
+                </section>
             </div>
         </div>
     );

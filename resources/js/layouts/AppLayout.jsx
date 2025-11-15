@@ -8,7 +8,7 @@ export default function AppLayout({ children }) {
     };
 
     return (
-        <div className="relative min-h-screen overflow-hidden bg-slate-950 text-white">
+        <div className="relative min-h-screen overflow-hidden bg-slate-950">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(99,102,241,0.28),transparent_55%),radial-gradient(circle_at_bottom,_rgba(14,165,233,0.22),transparent_60%)]" />
             <div className="absolute inset-y-0 -right-32 hidden lg:block h-[560px] w-[560px] rounded-full bg-gradient-to-br from-indigo-500/35 to-fuchsia-500/25 blur-3xl opacity-70" />
             <div className="absolute inset-y-0 -left-40 hidden lg:block h-[460px] w-[460px] rounded-full bg-gradient-to-tr from-sky-500/25 to-purple-500/20 blur-3xl opacity-70" />
@@ -37,8 +37,8 @@ export default function AppLayout({ children }) {
 
                 <main className="flex-1">{children}</main>
 
-                <footer className="border-t border-white/15 bg-white/5 py-6 text-white/80">
-                    <div className="container mx-auto px-4 text-center text-sm">
+                <footer className="border-t border-white/15 bg-white/5 py-6">
+                    <div className="container mx-auto px-4 text-center text-sm text-white/80">
                         Marshall Manurung &middot; NIM 11S23021
                     </div>
                 </footer>

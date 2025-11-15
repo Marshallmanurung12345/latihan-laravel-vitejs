@@ -5,7 +5,7 @@ import { Head, Link, router, usePage } from "@inertiajs/react";
 import ApexCharts from "react-apexcharts";
 import Pagination from "@/components/Pagination";
 import { cn } from "@/lib/utils";
-import { CircleDot, Clock, CheckCircle, Check, Loader } from "lucide-react";
+import { Clock, CheckCircle, Check, Loader } from "lucide-react";
 import FlashAlert from "@/components/FlashAlert";
 import {
     Card,
@@ -21,19 +21,19 @@ const STATUS_ORDER = ["pending", "in_progress", "completed"];
 const STATUS_META = {
     pending: {
         label: "Tertunda",
-        className: "bg-yellow-100 text-yellow-800 border-yellow-300",
+        className: "bg-amber-100/80 text-amber-900 border-amber-200",
         icon: Clock,
         color: "#F59E0B",
     },
     in_progress: {
         label: "Sedang Dikerjakan",
-        className: "bg-blue-100 text-blue-800 border-blue-300",
+        className: "bg-sky-100/80 text-sky-900 border-sky-200",
         icon: Loader,
-        color: "#3B82F6",
+        color: "#38BDF8",
     },
     completed: {
         label: "Selesai",
-        className: "bg-green-100 text-green-800 border-green-300",
+        className: "bg-emerald-100/80 text-emerald-900 border-emerald-200",
         icon: CheckCircle,
         color: "#10B981",
     },
@@ -53,9 +53,6 @@ const buildStats = (stats = {}) => {
     }
     return merged;
 };
-
-const normalizeDashboardStatus = (status) =>
-    status === "todo" ? "pending" : status;
 
 const adjustStatsCounts = (prevStats, fromStatus, toStatus) => {
     const next = { ...prevStats };
@@ -152,32 +149,18 @@ export default function HomePage() {
         );
     };
 
-    const getStatusBadge = (status) => {
-        const config = STATUS_META[status] ?? STATUS_META.pending;
-        const Icon = config.icon;
-
-        return (
-            <span
-                className={cn(
-                    "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border",
-                    config.className
-                )}
-            >
-                <Icon className="w-3.5 h-3.5" />
-                {config.label}
-            </span>
-        );
-    };
-
     const chartOptions = {
         chart: {
             type: "donut",
+            foreColor: "#e2e8f0",
         },
         labels: STATUS_ORDER.map((status) => STATUS_META[status].label),
         colors: STATUS_ORDER.map((status) => STATUS_META[status].color),
         legend: {
             position: "bottom",
+            labels: { colors: "#e2e8f0" },
         },
+        stroke: { colors: ["#0f172a"] },
     };
     const chartSeries = STATUS_ORDER.map((status) => localStats[status] ?? 0);
 
@@ -205,28 +188,28 @@ export default function HomePage() {
                 variant={alert?.variant}
                 onFinish={() => setAlert(null)}
             />
-            <div className="bg-muted/30">
-                <div className="container mx-auto px-4 py-10 space-y-8">
-                    <section className="rounded-3xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white p-8 shadow-xl flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-                        <div className="space-y-4">
-                            <p className="text-sm uppercase tracking-[0.2em] text-white/70">
-                                Dashboard
-                            </p>
-                            <div className="space-y-2">
-                                <h1 className="text-3xl font-bold leading-tight">
+            <div className="relative px-4 py-10 text-white">
+                <section className="mx-auto max-w-6xl space-y-6">
+                    <div className="rounded-3xl border border-white/15 bg-white/5 p-8 shadow-2xl backdrop-blur">
+                        <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+                            <div className="space-y-3">
+                                <p className="text-xs uppercase tracking-[0.3em] text-white/70">
+                                    Dashboard MarshallTodos
+                                </p>
+                                <h1 className="text-4xl font-semibold leading-tight">
                                     Hai, {auth.user.name}! ✨
                                 </h1>
-                                <p className="text-white/80 max-w-2xl">
+                                <p className="text-white/80">
                                     Selamat datang kembali. Pantau progres
-                                    rencana dan selesaikan prioritasmu dengan
-                                    lebih terstruktur.
+                                    rencana dengan tampilan yang konsisten di
+                                    seluruh aplikasi.
                                 </p>
                             </div>
                             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                                 {summaryCards.map((card) => (
                                     <div
                                         key={card.key}
-                                        className="rounded-2xl border border-white/30 bg-white/10 px-4 py-3"
+                                        className="rounded-2xl border border-white/15 bg-white/10 px-4 py-3 text-center"
                                     >
                                         <p className="text-xs uppercase text-white/70">
                                             {card.label}
@@ -238,232 +221,241 @@ export default function HomePage() {
                                 ))}
                             </div>
                         </div>
-                        <div className="bg-white/10 rounded-2xl p-6 backdrop-blur w-full max-w-sm space-y-4">
-                            <p className="text-sm text-white/80">
-                                Mulai rencana baru dalam hitungan detik.
-                            </p>
-                            <Link href={route("plans.create")}>
-                                <Button className="w-full bg-white text-blue-600 hover:bg-white/90">
-                                    + Buat Rencana
-                                </Button>
-                            </Link>
-                        </div>
-                    </section>
-
-                    <div className="grid gap-6 lg:grid-cols-3">
-                        <Card className="shadow-md">
-                            <CardHeader>
-                                <CardTitle>Statistik Status</CardTitle>
-                                <CardDescription>
-                                    Komposisi rencana berdasarkan status
-                                    terbaru.
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <ApexCharts
-                                    options={chartOptions}
-                                    series={chartSeries}
-                                    type="donut"
-                                    height={280}
-                                />
-                            </CardContent>
-                        </Card>
-                        <Card className="shadow-md lg:col-span-2">
-                            <CardHeader>
-                                <CardTitle>Pencarian & Filter</CardTitle>
-                                <CardDescription>
-                                    Temukan rencana sesuai kata kunci dan
-                                    status.
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                                <form
-                                    onSubmit={handleSearch}
-                                    className="space-y-4"
-                                >
-                                    <div className="flex flex-col gap-3 md:flex-row">
-                                        <Input
-                                            type="text"
-                                            value={search}
-                                            onChange={(e) =>
-                                                setSearch(e.target.value)
-                                            }
-                                            placeholder="Cari berdasarkan judul atau konten..."
-                                            className="flex-1"
-                                        />
-                                        <Button
-                                            type="submit"
-                                            className="w-full md:w-auto"
-                                        >
-                                            Cari
-                                        </Button>
-                                    </div>
-                                </form>
-                                <div className="flex flex-wrap gap-2">
-                                    {statusButtons.map((button) => (
-                                        <Button
-                                            key={button.value || "all"}
-                                            type="button"
-                                            variant={
-                                                statusFilter === button.value
-                                                    ? "default"
-                                                    : "outline"
-                                            }
-                                            size="sm"
-                                            onClick={() =>
-                                                handleStatusFilter(button.value)
-                                            }
-                                        >
-                                            {button.label}
-                                        </Button>
-                                    ))}
-                                </div>
-                            </CardContent>
-                        </Card>
                     </div>
+                </section>
 
-                    <Card className="shadow-lg">
-                        <CardHeader className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-                            <div>
-                                <CardTitle>Daftar Rencanamu</CardTitle>
-                                <CardDescription>
-                                    Ringkasan semua rencana dengan status
-                                    terbaru.
-                                </CardDescription>
-                            </div>
+                <div className="mx-auto mt-10 grid max-w-6xl gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+                    <Card className="border border-white/15 bg-white/5 text-white shadow-2xl">
+                        <CardHeader>
+                            <CardTitle>Statistik Status</CardTitle>
+                            <CardDescription className="text-white/70">
+                                Komposisi rencana berdasarkan status terbaru.
+                            </CardDescription>
                         </CardHeader>
-                        <CardContent className="space-y-6">
-                            {plans.data && plans.data.length > 0 ? (
-                                <div className="space-y-4">
-                                    {plans.data.map((plan) => (
-                                        <div
-                                            key={plan.id}
-                                            className="rounded-xl border border-border/60 bg-card/60 p-4 transition hover:shadow-md"
-                                        >
-                                            <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-                                                <div className="flex-1 space-y-2">
-                                                    <div className="flex flex-wrap items-center gap-3">
-                                                        <h4
-                                                            className={cn(
-                                                                "text-lg font-semibold transition-all",
-                                                                plan.status ===
-                                                                    "completed" &&
-                                                                    "text-muted-foreground line-through"
-                                                            )}
-                                                        >
-                                                            {plan.title}
-                                                        </h4>
-                                                        {getStatusBadge(
-                                                            plan.status
-                                                        )}
-                                                    </div>
-                                                    <p className="text-sm text-muted-foreground line-clamp-2">
-                                                        {plan.content}
-                                                    </p>
-                                                    <div className="space-y-1 text-xs text-muted-foreground">
-                                                        <p>
-                                                            Ditambahkan pada:{" "}
-                                                            {formatDateTime(
-                                                                plan.created_at
-                                                            )}
-                                                        </p>
-                                                        {plan.completed_at && (
-                                                            <p>
-                                                                Selesai pada:{" "}
-                                                                {formatDateTime(
-                                                                    plan.completed_at
-                                                                )}
-                                                            </p>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                                <div className="flex flex-wrap items-center gap-2">
-                                                    <button
-                                                        type="button"
-                                                        aria-label="Toggle status selesai"
-                                                        onClick={() =>
-                                                            handleToggleComplete(
-                                                                plan
-                                                            )
-                                                        }
-                                                        className={cn(
-                                                            "size-8 rounded-full border flex items-center justify-center transition-all",
-                                                            plan.status ===
-                                                                "completed"
-                                                                ? "bg-green-500 border-green-500 text-white"
-                                                                : "border-border text-muted-foreground hover:border-primary hover:text-primary"
-                                                        )}
-                                                    >
-                                                        {plan.status ===
-                                                        "completed" ? (
-                                                            <Check className="size-4" />
-                                                        ) : (
-                                                            <span className="text-[10px] font-semibold">
-                                                                ✓
-                                                            </span>
-                                                        )}
-                                                    </button>
-                                                    <Link
-                                                        href={route(
-                                                            "plans.show",
-                                                            plan.id
-                                                        )}
-                                                    >
-                                                        <Button
-                                                            variant="default"
-                                                            size="sm"
-                                                        >
-                                                            Detail
-                                                        </Button>
-                                                    </Link>
-                                                    <Link
-                                                        href={route(
-                                                            "plans.edit",
-                                                            plan.id
-                                                        )}
-                                                    >
-                                                        <Button
-                                                            variant="outline"
-                                                            size="sm"
-                                                        >
-                                                            Ubah
-                                                        </Button>
-                                                    </Link>
-                                                    <Button
-                                                        variant="destructive"
-                                                        size="sm"
-                                                        onClick={() =>
-                                                            handleDelete(plan)
-                                                        }
-                                                    >
-                                                        Hapus
-                                                    </Button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))}
+                        <CardContent>
+                            <ApexCharts
+                                options={chartOptions}
+                                series={chartSeries}
+                                type="donut"
+                                height={280}
+                            />
+                        </CardContent>
+                    </Card>
+                    <Card className="border border-white/15 bg-white/5 text-white shadow-2xl">
+                        <CardHeader>
+                            <CardTitle>Pencarian & Filter</CardTitle>
+                            <CardDescription className="text-white/70">
+                                Temukan rencana sesuai kata kunci dan status.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <form onSubmit={handleSearch} className="space-y-4">
+                                <div className="flex flex-col gap-3 md:flex-row">
+                                    <Input
+                                        type="text"
+                                        value={search}
+                                        onChange={(e) =>
+                                            setSearch(e.target.value)
+                                        }
+                                        placeholder="Cari berdasarkan judul atau konten..."
+                                        className="flex-1 border-white/30 bg-white/10 text-white placeholder-white/60"
+                                    />
+                                    <Button className="w-full bg-white/90 text-slate-900 hover:bg-white md:w-auto">
+                                        Cari
+                                    </Button>
                                 </div>
-                            ) : (
-                                <div className="text-center py-12 space-y-4">
-                                    <p className="text-muted-foreground">
-                                        Belum ada rencana. Mulai buat rencana
-                                        pertama Anda!
-                                    </p>
-                                    <Link href={route("plans.create")}>
-                                        <Button>Buat Rencana Pertama</Button>
-                                    </Link>
-                                </div>
-                            )}
-                            {plans.meta?.links && (
-                                <Pagination
-                                    links={plans.meta.links}
-                                    className="pt-4 border-t"
-                                />
-                            )}
+                            </form>
+                            <div className="flex flex-wrap gap-2">
+                                {statusButtons.map((button) => (
+                                    <Button
+                                        key={button.value || "all"}
+                                        type="button"
+                                        variant={
+                                            statusFilter === button.value
+                                                ? "default"
+                                                : "outline"
+                                        }
+                                        size="sm"
+                                        onClick={() =>
+                                            handleStatusFilter(button.value)
+                                        }
+                                        className={
+                                            statusFilter === button.value
+                                                ? "bg-white text-slate-900"
+                                                : "border-white/30 text-white"
+                                        }
+                                    >
+                                        {button.label}
+                                    </Button>
+                                ))}
+                            </div>
                         </CardContent>
                     </Card>
                 </div>
+
+                <Card className="mx-auto mt-10 max-w-6xl border border-white/15 bg-white/5 text-white shadow-2xl">
+                    <CardHeader className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+                        <div>
+                            <CardTitle>Daftar Rencanamu</CardTitle>
+                            <CardDescription className="text-white/70">
+                                Ringkasan semua rencana dengan status terbaru.
+                            </CardDescription>
+                        </div>
+                        <Link href={route("plans.create")}>
+                            <Button className="bg-white text-slate-900 hover:bg-white/90">
+                                + Buat Rencana
+                            </Button>
+                        </Link>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                        {plans.data && plans.data.length > 0 ? (
+                            <div className="space-y-4">
+                                {plans.data.map((plan) => (
+                                    <div
+                                        key={plan.id}
+                                        className="rounded-xl border border-white/10 bg-white/5 p-4"
+                                    >
+                                        <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                                            <div className="flex-1 space-y-2">
+                                                <div className="flex flex-wrap items-center gap-3">
+                                                    <h4
+                                                        className={cn(
+                                                            "text-lg font-semibold",
+                                                            plan.status ===
+                                                                "completed" &&
+                                                                "text-white/60 line-through"
+                                                        )}
+                                                    >
+                                                        {plan.title}
+                                                    </h4>
+                                                    <span className="text-xs">
+                                                        {formatDateTime(
+                                                            plan.created_at
+                                                        )}
+                                                    </span>
+                                                    <StatusBadge
+                                                        status={plan.status}
+                                                    />
+                                                </div>
+                                                <p className="text-sm text-white/80">
+                                                    {plan.content}
+                                                </p>
+                                                {plan.completed_at && (
+                                                    <p className="text-xs text-white/60">
+                                                        Selesai pada{" "}
+                                                        {formatDateTime(
+                                                            plan.completed_at
+                                                        )}
+                                                    </p>
+                                                )}
+                                            </div>
+                                            <div className="flex flex-wrap items-center gap-2">
+                                                <button
+                                                    type="button"
+                                                    aria-label="Toggle status selesai"
+                                                    onClick={() =>
+                                                        handleToggleComplete(
+                                                            plan
+                                                        )
+                                                    }
+                                                    className={cn(
+                                                        "size-8 rounded-full border flex items-center justify-center transition-all",
+                                                        plan.status ===
+                                                            "completed"
+                                                            ? "bg-emerald-500 border-emerald-500 text-white"
+                                                            : "border-white/40 text-white hover:border-white"
+                                                    )}
+                                                >
+                                                    {plan.status ===
+                                                    "completed" ? (
+                                                        <Check className="size-4" />
+                                                    ) : (
+                                                        <span className="text-[10px] font-semibold">
+                                                            ✓
+                                                        </span>
+                                                    )}
+                                                </button>
+                                                <Link
+                                                    href={route(
+                                                        "plans.show",
+                                                        plan.id
+                                                    )}
+                                                >
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        className="border-white/40 text-white hover:bg-white/10"
+                                                    >
+                                                        Detail
+                                                    </Button>
+                                                </Link>
+                                                <Link
+                                                    href={route(
+                                                        "plans.edit",
+                                                        plan.id
+                                                    )}
+                                                >
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        className="border-white/40 text-white hover:bg-white/10"
+                                                    >
+                                                        Ubah
+                                                    </Button>
+                                                </Link>
+                                                <Button
+                                                    variant="destructive"
+                                                    size="sm"
+                                                    className="border border-rose-200/50 bg-rose-500/80 text-white hover:bg-rose-500"
+                                                    onClick={() =>
+                                                        handleDelete(plan)
+                                                    }
+                                                >
+                                                    Hapus
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="text-center py-12 space-y-4 text-white/80">
+                                <p>
+                                    Belum ada rencana. Mulai buat rencana
+                                    pertama Anda!
+                                </p>
+                                <Link href={route("plans.create")}>
+                                    <Button className="bg-white text-slate-900 hover:bg-white/90">
+                                        Buat Rencana Pertama
+                                    </Button>
+                                </Link>
+                            </div>
+                        )}
+                        {plans.meta?.links && (
+                            <Pagination
+                                links={plans.meta.links}
+                                className="pt-4 border-t border-white/10"
+                            />
+                        )}
+                    </CardContent>
+                </Card>
             </div>
         </AppLayout>
+    );
+}
+
+function StatusBadge({ status }) {
+    const config = STATUS_META[status] ?? STATUS_META.pending;
+    const Icon = config.icon;
+    return (
+        <span
+            className={cn(
+                "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium",
+                config.className
+            )}
+        >
+            <Icon className="h-3.5 w-3.5" />
+            {config.label}
+        </span>
     );
 }
