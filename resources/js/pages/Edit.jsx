@@ -1,30 +1,31 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Head, Link, useForm } from "@inertiajs/react";
 
-export default function Create() {
+export default function Edit({ plan }) {
     const { data, setData, post, processing, errors } = useForm({
-        title: "",
-        content: "",
-        // Pastikan status diinisialisasi dengan nilai yang valid, misal 'pending'
-        status: "pending",
+        _method: "PUT", // Method-spoofing untuk update
+        title: plan.title || "",
+        content: plan.content || "",
+        status: plan.status || "pending",
     });
 
     function submit(e) {
         e.preventDefault();
-        post(route("plans.store"));
+        // Kirim ke route update dengan ID plan
+        post(route("plans.update", plan.id));
     }
 
     return (
         <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
             <div className="container mx-auto max-w-2xl">
-                <Head title="Tambah Catatan Baru" />
+                <Head title={`Ubah Rencana: ${plan.title}`} />
 
                 <form
                     onSubmit={submit}
                     className="bg-white p-8 rounded-lg shadow-md"
                 >
                     <h1 className="text-2xl font-bold mb-6 text-center">
-                        Tambah Catatan Baru
+                        Ubah Rencana
                     </h1>
                     <div className="space-y-6">
                         <div>
@@ -88,7 +89,7 @@ export default function Create() {
                             disabled={processing}
                             className="inline-flex justify-center px-4 py-2 bg-blue-600 text-white font-semibold rounded-md shadow-sm hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
                         >
-                            {processing ? "Menyimpan..." : "Simpan Rencana"}
+                            {processing ? "Menyimpan..." : "Simpan Perubahan"}
                         </button>
                     </div>
                 </form>
