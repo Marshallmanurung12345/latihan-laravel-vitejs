@@ -37,6 +37,21 @@ export default function FormPage({ plan }) {
         _method: isEditing ? "PUT" : "POST",
     });
 
+    useEffect(() => {
+        setData((prev) => ({
+            ...prev,
+            title: plan?.title || "",
+            content: plan?.content || "",
+            status: plan?.status || "todo",
+            cover_image: null,
+            _method: isEditing ? "PUT" : "POST",
+        }));
+        setPreviewUrl(plan?.cover_image_url || null);
+        if (fileInputRef.current) {
+            fileInputRef.current.value = "";
+        }
+    }, [isEditing, plan?.id]);
+
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         if (file) {
