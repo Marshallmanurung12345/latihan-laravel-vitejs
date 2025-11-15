@@ -20,6 +20,7 @@ export default function HomePage() {
     const { auth, plans, stats, filters, flash } = usePage().props;
     const [search, setSearch] = useState(filters?.search || "");
     const [statusFilter, setStatusFilter] = useState(filters?.status || "");
+    const [localStats, setLocalStats] = useState(stats);
 
     const formatDateTime = (isoString) => {
         if (!isoString) return "-";
@@ -33,6 +34,10 @@ export default function HomePage() {
             minute: "2-digit",
         }).format(date);
     };
+
+    useEffect(() => {
+        setLocalStats(stats);
+    }, [stats]);
 
     useEffect(() => {
         if (flash?.success) {
@@ -96,16 +101,34 @@ export default function HomePage() {
         const newStatus =
             originalStatus === "completed" ? "pending" : "completed";
 
+        // Simpan stats asli untuk rollback jika terjadi error
+        const originalStats = { ...localStats };
+
         // Optimistic update
         router.post(
             route("plans.toggle", plan.id),
             {},
             {
                 preserveScroll: true,
+                // Langsung perbarui UI sebelum server merespons
                 onStart: () => {
-                    // Secara visual, langsung ubah status plan di daftar
+                    // 1. Ubah status item rencana secara visual
                     plan.status = newStatus;
+                    // 2. Perbarui statistik secara lokal
+                    setLocalStats((prevStats) => {
+                        const newCompleted =
+                            newStatus === "completed"
+                                ? prevStats.completed + 1
+                                : prevStats.completed - 1;
+                        const newPending = prevStats.total - newCompleted;
+                        return {
+                            ...prevStats,
+                            completed: newCompleted,
+                            pending: newPending,
+                        };
+                    });
                 },
+                // Jika gagal, kembalikan semua ke state semula
                 onError: () => {
                     // Jika gagal, kembalikan ke status semula
                     plan.status = originalStatus;
@@ -159,12 +182,12 @@ export default function HomePage() {
             position: "bottom",
         },
     };
-    const chartSeries = [stats.pending ?? 0, stats.completed ?? 0];
+    const chartSeries = [localStats.pending ?? 0, localStats.completed ?? 0];
 
     const statusButtons = [
-        { value: "", label: `Semua (${stats.total ?? 0})` },
-        { value: "pending", label: `Tertunda (${stats.pending ?? 0})` },
-        { value: "completed", label: `Selesai (${stats.completed ?? 0})` },
+        { value: "", label: `Semua (${localStats.total ?? 0})` },
+        { value: "pending", label: `Tertunda (${localStats.pending ?? 0})` },
+        { value: "completed", label: `Selesai (${localStats.completed ?? 0})` },
     ];
 
     return (
@@ -193,7 +216,7 @@ export default function HomePage() {
                                         Total rencana
                                     </p>
                                     <p className="text-2xl font-semibold">
-                                        {stats.total ?? 0}
+                                        {localStats.total ?? 0}
                                     </p>
                                 </div>
                                 <div className="rounded-2xl border border-white/30 bg-white/10 px-4 py-3">
@@ -201,7 +224,7 @@ export default function HomePage() {
                                         Selesai
                                     </p>
                                     <p className="text-2xl font-semibold">
-                                        {stats.completed ?? 0}
+                                        {localStats.completed ?? 0}
                                     </p>
                                 </div>
                                 <div className="rounded-2xl border border-white/30 bg-white/10 px-4 py-3">
@@ -209,7 +232,7 @@ export default function HomePage() {
                                         Tertunda
                                     </p>
                                     <p className="text-2xl font-semibold">
-                                        {stats.pending ?? 0}
+                                        {localStats.pending ?? 0}
                                     </p>
                                 </div>
                             </div>
