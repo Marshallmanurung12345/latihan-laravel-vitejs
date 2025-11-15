@@ -7,6 +7,7 @@ import {
     SearchIcon,
     TrashIcon,
 } from "@heroicons/react/24/solid";
+import FlashAlert from "@/components/FlashAlert";
 
 // Komponen untuk Pagination Links
 const Pagination = ({ links }) => {
@@ -42,15 +43,14 @@ const Pagination = ({ links }) => {
 export default function Home({ plans, filters, stats }) {
     const { flash } = usePage().props;
     const [search, setSearch] = useState(filters.search || "");
+    const [alert, setAlert] = useState(null);
 
-    // Efek untuk menampilkan notifikasi alert bawaan browser
     useEffect(() => {
         if (!flash) return;
-
         if (flash.success) {
-            window.alert(`Berhasil!\n${flash.success}`);
+            setAlert({ message: flash.success, variant: "success" });
         } else if (flash.error) {
-            window.alert(`Gagal!\n${flash.error}`);
+            setAlert({ message: flash.error, variant: "error" });
         }
     }, [flash]);
 
@@ -85,6 +85,11 @@ export default function Home({ plans, filters, stats }) {
 
     return (
         <div className="min-h-screen bg-gray-100">
+            <FlashAlert
+                text={alert?.message}
+                variant={alert?.variant}
+                onFinish={() => setAlert(null)}
+            />
             <div className="container mx-auto p-4 md:p-8">
                 <Head title="Dashboard Rencana" />
                 <h1 className="text-3xl font-bold mb-6">Dashboard Rencana</h1>

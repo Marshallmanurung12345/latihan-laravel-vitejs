@@ -6,6 +6,7 @@ import ApexCharts from "react-apexcharts";
 import Pagination from "@/components/Pagination";
 import { cn } from "@/lib/utils";
 import { CircleDot, Clock, CheckCircle, Check, Loader } from "lucide-react";
+import FlashAlert from "@/components/FlashAlert";
 import {
     Card,
     CardContent,
@@ -73,6 +74,7 @@ export default function HomePage() {
     const [search, setSearch] = useState(filters?.search || "");
     const [statusFilter, setStatusFilter] = useState(filters?.status || "");
     const [localStats, setLocalStats] = useState(buildStats(stats));
+    const [alert, setAlert] = useState(null);
 
     const formatDateTime = (isoString) => {
         if (!isoString) return "-";
@@ -93,11 +95,10 @@ export default function HomePage() {
 
     useEffect(() => {
         if (!flash) return;
-
         if (flash.success) {
-            window.alert(`Berhasil!\n${flash.success}`);
+            setAlert({ message: flash.success, variant: "success" });
         } else if (flash.error) {
-            window.alert(`Gagal!\n${flash.error}`);
+            setAlert({ message: flash.error, variant: "error" });
         }
     }, [flash]);
 
@@ -200,6 +201,11 @@ export default function HomePage() {
     return (
         <AppLayout>
             <Head title="Dashboard" />
+            <FlashAlert
+                text={alert?.message}
+                variant={alert?.variant}
+                onFinish={() => setAlert(null)}
+            />
             <div className="bg-muted/30">
                 <div className="container mx-auto px-4 py-10 space-y-8">
                     <section className="rounded-3xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white p-8 shadow-xl flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
