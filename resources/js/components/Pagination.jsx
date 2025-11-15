@@ -2,14 +2,14 @@ import { Link } from "@inertiajs/react";
 
 export default function Pagination({ links, className = "" }) {
     return (
-        <div className={`flex items-center space-x-1 ${className}`}>
+        <div className={`flex flex-wrap items-center -mb-1 ${className}`}>
             {links.map((link, i) => {
                 if (!link.url) {
                     return (
                         <span
                             key={i}
                             dangerouslySetInnerHTML={{ __html: link.label }}
-                            className="px-3 py-2 text-sm text-gray-400 border rounded"
+                            className="mr-1 mb-1 px-4 py-3 text-sm leading-4 text-white/40 border border-white/20 rounded-md"
                         />
                     );
                 }
@@ -17,8 +17,10 @@ export default function Pagination({ links, className = "" }) {
                     <Link
                         key={`link-${i}`}
                         href={link.url}
-                        className={`px-3 py-2 text-sm border rounded hover:bg-blue-600 hover:text-white ${
-                            link.active ? "bg-blue-600 text-white" : "bg-white"
+                        className={`mr-1 mb-1 px-4 py-3 text-sm leading-4 border rounded-md transition-colors duration-200 ${
+                            link.active
+                                ? "bg-white text-slate-900"
+                                : "bg-white/5 text-white/80 hover:bg-white/10"
                         }`}
                         dangerouslySetInnerHTML={{ __html: link.label }}
                     />
