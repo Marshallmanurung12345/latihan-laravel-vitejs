@@ -37,6 +37,7 @@ class PlanController extends Controller
             'completed' => $baseStatsQuery->clone()->completed()->count(),
             'in_progress' => $baseStatsQuery->clone()->inProgress()->count(),
             'pending' => $baseStatsQuery->clone()->pending()->count(),
+            'todo' => $baseStatsQuery->clone()->todo()->count(),
         ];
 
         return Inertia::render('app/HomePage', [
@@ -76,7 +77,7 @@ class PlanController extends Controller
 
         $validated['user_id'] = auth()->id(); // Tambahkan ID pengguna yang sedang login
 
-        // Jika status adalah 'completed', set waktu sekarang.
+        // Jika status diatur sebagai 'completed', set waktu penyelesaian.
         if (isset($validated['status']) && $validated['status'] === 'completed') {
             $validated['completed_at'] = now();
         }
@@ -142,6 +143,24 @@ class PlanController extends Controller
         $plan->delete();
 
         return to_route('home')->with('success', 'Rencana berhasil dihapus!');
+    }
+
+    /**
+     * Menandai rencana sebagai selesai.
+     */
+    public function markAsCompleted(Plan $plan): RedirectResponse
+    {
+        // Otorisasi: Pastikan pengguna hanya bisa mengubah rencananya sendiri.
+        if (auth()->id() !== $plan->user_id) {
+            abort(403);
+        }
+
+        $plan->update([
+            'status' => Plan::STATUS_COMPLETED,
+            'completed_at' => now(),
+        ]);
+
+        return back()->with('success', 'Rencana ditandai selesai!');
     }
 
     /**
