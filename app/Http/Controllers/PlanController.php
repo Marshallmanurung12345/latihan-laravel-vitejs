@@ -8,6 +8,7 @@ use App\Http\Resources\PlanResource;
 use App\Models\Plan;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -28,21 +29,27 @@ class PlanController extends Controller
             ->when($request->input('status'), function ($query, $status) {
                 $query->where('status', $status);
             })
-            ->latest();
+            ->latest('id');
 
-        // Statistik untuk ApexCharts (lebih efisien dengan satu kueri)
-        $baseStatsQuery = Plan::where('user_id', auth()->id());
+        // Statistik untuk ApexCharts (dioptimalkan menjadi satu kueri)
+        $statusCounts = Plan::query()
+            ->where('user_id', auth()->id())
+            ->select('status', DB::raw('count(*) as count'))
+            ->groupBy('status')
+            ->pluck('count', 'status');
+
         $stats = [
-            'total' => $baseStatsQuery->clone()->count(),
-            'completed' => $baseStatsQuery->clone()->completed()->count(),
-            'in_progress' => $baseStatsQuery->clone()->inProgress()->count(),
-            'pending' => $baseStatsQuery->clone()->pending()->count(),
-            'todo' => $baseStatsQuery->clone()->todo()->count(),
+            'done' => $statusCounts->get(Plan::STATUS_COMPLETED, 0),
+            'in_progress' => $statusCounts->get(Plan::STATUS_IN_PROGRESS, 0),
+            'pending' => $statusCounts->get(Plan::STATUS_PENDING, 0),
+            'todo' => $statusCounts->get(Plan::STATUS_TODO, 0),
+            // Total adalah jumlah dari semua status
+            'total' => $statusCounts->sum(),
         ];
 
         return Inertia::render('app/HomePage', [
             // Gunakan Resource Collection untuk transformasi data paginasi
-            'plans' => PlanResource::collection($plansQuery->paginate(20)->withQueryString()),
+            'plans' => PlanResource::collection($plansQuery->paginate(10)->withQueryString()),
             'filters' => $request->only(['search', 'status']),
             'stats' => $stats,
         ]);
@@ -63,7 +70,7 @@ class PlanController extends Controller
      */
     public function create(): Response
     {
-        return Inertia::render('plans/Form', [
+        return Inertia::render('Create', [
             'plan' => null,
         ]);
     }
@@ -75,18 +82,23 @@ class PlanController extends Controller
     {
         $validated = $request->validated();
 
-        $validated['user_id'] = auth()->id(); // Tambahkan ID pengguna yang sedang login
+        // 1. Set pemilik rencana adalah pengguna yang sedang login.
+        $validated['user_id'] = auth()->id();
 
-        // Jika status diatur sebagai 'completed', set waktu penyelesaian.
-        if (isset($validated['status']) && $validated['status'] === 'completed') {
+        // 2. Atur waktu penyelesaian jika statusnya 'completed'.
+        if (isset($validated['status']) && $validated['status'] === Plan::STATUS_COMPLETED) {
             $validated['completed_at'] = now();
         }
 
+        // 3. Proses dan simpan gambar sampul jika ada yang diunggah dari form.
+        // Logika ini sudah siap. Pastikan form di frontend memiliki:
+        // <input type="file" @input="form.cover_image = $event.target.files[0]">
+        // dan 'cover_image' terdaftar di useForm Inertia.
         if ($request->hasFile('cover_image')) {
             $validated['cover'] = $request->file('cover_image')->store('covers', 'public');
         }
 
-        $plan = Plan::create($validated);
+        Plan::create($validated);
 
         return to_route('home')->with('success', 'Rencana berhasil ditambahkan!');
     }
@@ -96,7 +108,7 @@ class PlanController extends Controller
      */
     public function edit(Plan $plan): Response
     {
-        return Inertia::render('plans/Form', [
+        return Inertia::render('Edit', [
             'plan' => $plan,
         ]);
     }
