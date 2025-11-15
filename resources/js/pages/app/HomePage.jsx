@@ -50,11 +50,7 @@ export default function HomePage() {
 
     const handleStatusFilter = (status) => {
         setStatusFilter(status);
-        router.get(
-            route("home"),
-            { search, status },
-            { preserveState: true }
-        );
+        router.get(route("home"), { search, status }, { preserveState: true });
     };
 
     const handleDelete = (plan) => {
@@ -131,7 +127,8 @@ export default function HomePage() {
                             👋 Hai, {auth.user.name}!
                         </h1>
                         <p className="text-muted-foreground mt-1">
-                            Selamat datang kembali, mari kita produktif hari ini.
+                            Selamat datang kembali, mari kita produktif hari
+                            ini.
                         </p>
                     </div>
                     <Link href={route("plans.create")}>
@@ -157,7 +154,10 @@ export default function HomePage() {
                         <h3 className="font-semibold text-lg mb-4">
                             Cari & Filter Rencana
                         </h3>
-                        <form onSubmit={handleSearch} className="flex flex-col gap-4">
+                        <form
+                            onSubmit={handleSearch}
+                            className="flex flex-col gap-4"
+                        >
                             <div className="flex gap-2">
                                 <input
                                     type="text"
@@ -171,7 +171,11 @@ export default function HomePage() {
                             <div className="flex gap-2 flex-wrap">
                                 <Button
                                     type="button"
-                                    variant={statusFilter === "" ? "default" : "outline"}
+                                    variant={
+                                        statusFilter === ""
+                                            ? "default"
+                                            : "outline"
+                                    }
                                     size="sm"
                                     onClick={() => handleStatusFilter("")}
                                 >
@@ -179,25 +183,43 @@ export default function HomePage() {
                                 </Button>
                                 <Button
                                     type="button"
-                                    variant={statusFilter === "pending" ? "default" : "outline"}
+                                    variant={
+                                        statusFilter === "pending"
+                                            ? "default"
+                                            : "outline"
+                                    }
                                     size="sm"
-                                    onClick={() => handleStatusFilter("pending")}
+                                    onClick={() =>
+                                        handleStatusFilter("pending")
+                                    }
                                 >
                                     Tertunda ({stats.pending})
                                 </Button>
                                 <Button
                                     type="button"
-                                    variant={statusFilter === "in_progress" ? "default" : "outline"}
+                                    variant={
+                                        statusFilter === "in_progress"
+                                            ? "default"
+                                            : "outline"
+                                    }
                                     size="sm"
-                                    onClick={() => handleStatusFilter("in_progress")}
+                                    onClick={() =>
+                                        handleStatusFilter("in_progress")
+                                    }
                                 >
                                     Dikerjakan ({stats.in_progress})
                                 </Button>
                                 <Button
                                     type="button"
-                                    variant={statusFilter === "completed" ? "default" : "outline"}
+                                    variant={
+                                        statusFilter === "completed"
+                                            ? "default"
+                                            : "outline"
+                                    }
                                     size="sm"
-                                    onClick={() => handleStatusFilter("completed")}
+                                    onClick={() =>
+                                        handleStatusFilter("completed")
+                                    }
                                 >
                                     Selesai ({stats.completed})
                                 </Button>
@@ -237,23 +259,37 @@ export default function HomePage() {
                                         </div>
                                         <div className="flex items-center space-x-2">
                                             <Link
-                                                href={route("plans.show", plan.id)}
+                                                href={route(
+                                                    "plans.show",
+                                                    plan.id
+                                                )}
                                             >
-                                                <Button variant="default" size="sm">
+                                                <Button
+                                                    variant="default"
+                                                    size="sm"
+                                                >
                                                     Detail
                                                 </Button>
                                             </Link>
                                             <Link
-                                                href={route("plans.edit", plan.id)}
+                                                href={route(
+                                                    "plans.edit",
+                                                    plan.id
+                                                )}
                                             >
-                                                <Button variant="outline" size="sm">
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                >
                                                     Ubah
                                                 </Button>
                                             </Link>
                                             <Button
                                                 variant="destructive"
                                                 size="sm"
-                                                onClick={() => handleDelete(plan)}
+                                                onClick={() =>
+                                                    handleDelete(plan)
+                                                }
                                             >
                                                 Hapus
                                             </Button>
@@ -264,7 +300,8 @@ export default function HomePage() {
                         ) : (
                             <div className="text-center py-12">
                                 <p className="text-gray-500 mb-4">
-                                    Belum ada rencana. Mulai buat rencana pertama Anda!
+                                    Belum ada rencana. Mulai buat rencana
+                                    pertama Anda!
                                 </p>
                                 <Link href={route("plans.create")}>
                                     <Button>Buat Rencana Pertama</Button>
