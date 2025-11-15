@@ -15,7 +15,13 @@ class PlanResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        // Mengembalikan semua atribut model, termasuk accessor yang sudah di-append
-        return parent::toArray($request);
+        return [
+            'id' => $this->id,
+            'title' => $this->title,
+            'content' => $this->content,
+            'cover_url' => $this->cover_url, // Accessor akan dipanggil di sini
+            'completed_at' => $this->completed_at?->toIso8601String(),
+            'created_at' => $this->created_at->toIso8601String(),
+        ];
     }
 }

@@ -75,7 +75,7 @@ class PlanController extends Controller
         // Hapus cover_image dari array yang divalidasi karena tidak ada di tabel database
         unset($validated['cover_image']);
 
-        Plan::create($validated);
+        $plan = Plan::create($validated);
 
         return to_route('plans.index')->with('success', 'Rencana berhasil ditambahkan!');
     }
