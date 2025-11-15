@@ -224,7 +224,7 @@ export default function HomePage() {
                     </div>
                 </section>
 
-                <div className="mx-auto mt-10 grid max-w-6xl gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+                <section className="mx-auto mt-10 grid max-w-6xl gap-6 lg:grid-cols-[1.1fr_0.9fr]">
                     <Card className="border border-white/15 bg-white/5 text-white shadow-2xl">
                         <CardHeader>
                             <CardTitle>Statistik Status</CardTitle>
@@ -291,7 +291,7 @@ export default function HomePage() {
                             </div>
                         </CardContent>
                     </Card>
-                </div>
+                </section>
 
                 <Card className="mx-auto mt-10 max-w-6xl border border-white/15 bg-white/5 text-white shadow-2xl">
                     <CardHeader className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
