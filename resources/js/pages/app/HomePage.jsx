@@ -282,7 +282,7 @@ export default function HomePage() {
                                         className={
                                             statusFilter === button.value
                                                 ? "bg-white text-slate-900"
-                                                : "border-white/30 text-white"
+                                                : "border-white/30 bg-transparent text-white hover:bg-white/10"
                                         }
                                     >
                                         {button.label}
@@ -384,7 +384,7 @@ export default function HomePage() {
                                                     <Button
                                                         variant="outline"
                                                         size="sm"
-                                                        className="border-white/40 text-white hover:bg-white/10"
+                                                        className="border-white/40 bg-transparent text-white hover:bg-white/10"
                                                     >
                                                         Detail
                                                     </Button>
@@ -398,7 +398,7 @@ export default function HomePage() {
                                                     <Button
                                                         variant="outline"
                                                         size="sm"
-                                                        className="border-white/40 text-white hover:bg-white/10"
+                                                        className="border-white/40 bg-transparent text-white hover:bg-white/10"
                                                     >
                                                         Ubah
                                                     </Button>
