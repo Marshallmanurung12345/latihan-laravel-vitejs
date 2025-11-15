@@ -5,7 +5,7 @@ import { Head, Link, router, usePage } from "@inertiajs/react";
 import ApexCharts from "react-apexcharts";
 import Pagination from "@/components/Pagination";
 import { cn } from "@/lib/utils";
-import { Clock, CheckCircle, Check, Loader } from "lucide-react";
+import { CircleDot, Clock, CheckCircle, Check, Loader } from "lucide-react";
 import {
     Card,
     CardContent,
@@ -15,11 +15,64 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 
+const STATUS_ORDER = ["todo", "pending", "in_progress", "completed"];
+
+const STATUS_META = {
+    todo: {
+        label: "Belum Dimulai",
+        className: "bg-slate-100 text-slate-800 border-slate-300",
+        icon: CircleDot,
+        color: "#94A3B8",
+    },
+    pending: {
+        label: "Tertunda",
+        className: "bg-yellow-100 text-yellow-800 border-yellow-300",
+        icon: Clock,
+        color: "#F59E0B",
+    },
+    in_progress: {
+        label: "Sedang Dikerjakan",
+        className: "bg-blue-100 text-blue-800 border-blue-300",
+        icon: Loader,
+        color: "#3B82F6",
+    },
+    completed: {
+        label: "Selesai",
+        className: "bg-green-100 text-green-800 border-green-300",
+        icon: CheckCircle,
+        color: "#10B981",
+    },
+};
+
+const DEFAULT_STATS = {
+    total: 0,
+    todo: 0,
+    pending: 0,
+    in_progress: 0,
+    completed: 0,
+};
+
+const buildStats = (stats = {}) => ({
+    ...DEFAULT_STATS,
+    ...stats,
+});
+
+const adjustStatsCounts = (prevStats, fromStatus, toStatus) => {
+    const next = { ...prevStats };
+    if (fromStatus && next[fromStatus] !== undefined) {
+        next[fromStatus] = Math.max(0, (next[fromStatus] ?? 0) - 1);
+    }
+    if (toStatus && next[toStatus] !== undefined) {
+        next[toStatus] = (next[toStatus] ?? 0) + 1;
+    }
+    return next;
+};
+
 export default function HomePage() {
     const { auth, plans, stats, filters, flash } = usePage().props;
     const [search, setSearch] = useState(filters?.search || "");
     const [statusFilter, setStatusFilter] = useState(filters?.status || "");
-    const [localStats, setLocalStats] = useState(stats);
+    const [localStats, setLocalStats] = useState(buildStats(stats));
 
     const formatDateTime = (isoString) => {
         if (!isoString) return "-";
@@ -35,7 +88,7 @@ export default function HomePage() {
     };
 
     useEffect(() => {
-        setLocalStats(stats);
+        setLocalStats(buildStats(stats));
     }, [stats]);
 
     useEffect(() => {
@@ -77,66 +130,30 @@ export default function HomePage() {
         const newStatus =
             originalStatus === "completed" ? "pending" : "completed";
 
-        // Simpan stats asli untuk rollback jika terjadi error
         const originalStats = { ...localStats };
 
-        // Optimistic update
         router.post(
             route("plans.toggle", plan.id),
             {},
             {
                 preserveScroll: true,
-                // Langsung perbarui UI sebelum server merespons
                 onStart: () => {
-                    // 1. Ubah status item rencana secara visual
                     plan.status = newStatus;
-                    // 2. Perbarui statistik secara lokal
-                    setLocalStats((prevStats) => {
-                        const newCompleted =
-                            newStatus === "completed"
-                                ? prevStats.completed + 1
-                                : prevStats.completed - 1;
-                        const newPending = prevStats.total - newCompleted;
-                        return {
-                            ...prevStats,
-                            completed: newCompleted,
-                            pending: newPending,
-                        };
-                    });
+                    setLocalStats((prevStats) =>
+                        adjustStatsCounts(prevStats, originalStatus, newStatus)
+                    );
                 },
-                // Jika gagal, kembalikan semua ke state semula
                 onError: () => {
-                    // Jika gagal, kembalikan ke status semula
                     plan.status = originalStatus;
-                    setLocalStats(originalStats); // Kembalikan juga statistik
+                    setLocalStats(originalStats);
                 },
-                onSuccess: () => {
-                    // Jangan lakukan apa-apa, karena kita sudah memperbarui stats secara optimis.
-                },
+                onSuccess: () => {},
             }
         );
     };
 
     const getStatusBadge = (status) => {
-        const statusConfig = {
-            pending: {
-                label: "Tertunda",
-                className: "bg-yellow-100 text-yellow-800 border-yellow-300",
-                icon: Clock,
-            },
-            in_progress: {
-                label: "Sedang Dikerjakan",
-                className: "bg-blue-100 text-blue-800 border-blue-300",
-                icon: Loader,
-            },
-            completed: {
-                label: "Selesai",
-                className: "bg-green-100 text-green-800 border-green-300",
-                icon: CheckCircle,
-            },
-        };
-
-        const config = statusConfig[status] || statusConfig.pending;
+        const config = STATUS_META[status] ?? STATUS_META.pending;
         const Icon = config.icon;
 
         return (
@@ -156,18 +173,28 @@ export default function HomePage() {
         chart: {
             type: "donut",
         },
-        labels: ["Tertunda", "Selesai"],
-        colors: ["#F59E0B", "#10B981"], // Warna untuk Tertunda, Selesai
+        labels: STATUS_ORDER.map((status) => STATUS_META[status].label),
+        colors: STATUS_ORDER.map((status) => STATUS_META[status].color),
         legend: {
             position: "bottom",
         },
     };
-    const chartSeries = [localStats.pending ?? 0, localStats.completed ?? 0];
+    const chartSeries = STATUS_ORDER.map((status) => localStats[status] ?? 0);
 
     const statusButtons = [
         { value: "", label: `Semua (${localStats.total ?? 0})` },
-        { value: "pending", label: `Tertunda (${localStats.pending ?? 0})` },
-        { value: "completed", label: `Selesai (${localStats.completed ?? 0})` },
+        ...STATUS_ORDER.map((status) => ({
+            value: status,
+            label: `${STATUS_META[status].label} (${localStats[status] ?? 0})`,
+        })),
+    ];
+
+    const summaryCards = [
+        { key: "total", label: "Total Rencana" },
+        ...STATUS_ORDER.map((status) => ({
+            key: status,
+            label: STATUS_META[status].label,
+        })),
     ];
 
     return (
@@ -190,31 +217,20 @@ export default function HomePage() {
                                     lebih terstruktur.
                                 </p>
                             </div>
-                            <div className="flex flex-wrap gap-4">
-                                <div className="rounded-2xl border border-white/30 bg-white/10 px-4 py-3">
-                                    <p className="text-xs uppercase text-white/70">
-                                        Total rencana
-                                    </p>
-                                    <p className="text-2xl font-semibold">
-                                        {localStats.total ?? 0}
-                                    </p>
-                                </div>
-                                <div className="rounded-2xl border border-white/30 bg-white/10 px-4 py-3">
-                                    <p className="text-xs uppercase text-white/70">
-                                        Selesai
-                                    </p>
-                                    <p className="text-2xl font-semibold">
-                                        {localStats.completed ?? 0}
-                                    </p>
-                                </div>
-                                <div className="rounded-2xl border border-white/30 bg-white/10 px-4 py-3">
-                                    <p className="text-xs uppercase text-white/70">
-                                        Tertunda
-                                    </p>
-                                    <p className="text-2xl font-semibold">
-                                        {localStats.pending ?? 0}
-                                    </p>
-                                </div>
+                            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                                {summaryCards.map((card) => (
+                                    <div
+                                        key={card.key}
+                                        className="rounded-2xl border border-white/30 bg-white/10 px-4 py-3"
+                                    >
+                                        <p className="text-xs uppercase text-white/70">
+                                            {card.label}
+                                        </p>
+                                        <p className="text-2xl font-semibold">
+                                            {localStats[card.key] ?? 0}
+                                        </p>
+                                    </div>
+                                ))}
                             </div>
                         </div>
                         <div className="bg-white/10 rounded-2xl p-6 backdrop-blur w-full max-w-sm space-y-4">
@@ -234,7 +250,8 @@ export default function HomePage() {
                             <CardHeader>
                                 <CardTitle>Statistik Status</CardTitle>
                                 <CardDescription>
-                                    Komposisi rencana berdasarkan status.
+                                    Komposisi rencana berdasarkan status
+                                    terbaru.
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>

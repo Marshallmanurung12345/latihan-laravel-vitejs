@@ -39,12 +39,11 @@ class PlanController extends Controller
             ->pluck('count', 'status');
 
         $stats = [
-            'done' => $statusCounts->get(Plan::STATUS_COMPLETED, 0),
-            'in_progress' => $statusCounts->get(Plan::STATUS_IN_PROGRESS, 0),
-            'pending' => $statusCounts->get(Plan::STATUS_PENDING, 0),
-            'todo' => $statusCounts->get(Plan::STATUS_TODO, 0),
-            // Total adalah jumlah dari semua status
             'total' => $statusCounts->sum(),
+            'todo' => $statusCounts->get(Plan::STATUS_TODO, 0),
+            'pending' => $statusCounts->get(Plan::STATUS_PENDING, 0),
+            'in_progress' => $statusCounts->get(Plan::STATUS_IN_PROGRESS, 0),
+            'completed' => $statusCounts->get(Plan::STATUS_COMPLETED, 0),
         ];
 
         return Inertia::render('app/HomePage', [
