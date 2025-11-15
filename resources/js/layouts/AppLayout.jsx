@@ -8,10 +8,10 @@ export default function AppLayout({ children }) {
     };
 
     return (
-        <div className="relative min-h-screen overflow-hidden bg-slate-900">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(148,163,184,0.35),transparent_55%),linear-gradient(135deg,_rgba(15,23,42,0.96),_rgba(30,41,59,0.96))]" />
-            <div className="absolute inset-y-0 -right-28 hidden lg:block h-[460px] w-[460px] rounded-full bg-gradient-to-br from-indigo-300/35 to-fuchsia-200/25 blur-[150px]" />
-            <div className="absolute inset-y-0 -left-32 hidden lg:block h-[360px] w-[360px] rounded-full bg-gradient-to-tr from-sky-200/30 to-purple-200/20 blur-[150px]" />
+        <div className="relative min-h-screen overflow-hidden bg-slate-950">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(99,102,241,0.28),transparent_55%),radial-gradient(circle_at_bottom,_rgba(14,165,233,0.22),transparent_60%)]" />
+            <div className="absolute inset-y-0 -right-32 hidden lg:block h-[560px] w-[560px] rounded-full bg-gradient-to-br from-indigo-500/35 to-fuchsia-500/25 blur-3xl opacity-70" />
+            <div className="absolute inset-y-0 -left-40 hidden lg:block h-[460px] w-[460px] rounded-full bg-gradient-to-tr from-sky-500/25 to-purple-500/20 blur-3xl opacity-70" />
 
             <div className="relative z-10 flex min-h-screen flex-col">
                 <nav className="border-b border-white/15 bg-white/5 backdrop-blur">
