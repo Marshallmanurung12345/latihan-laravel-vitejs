@@ -70,7 +70,7 @@ class PlanController extends Controller
      */
     public function create(): Response
     {
-        return Inertia::render('Create', [
+        return Inertia::render('plans/Form', [
             'plan' => null,
         ]);
     }
@@ -108,8 +108,8 @@ class PlanController extends Controller
      */
     public function edit(Plan $plan): Response
     {
-        return Inertia::render('Edit', [
-            'plan' => $plan,
+        return Inertia::render('plans/Form', [
+            'plan' => new PlanResource($plan),
         ]);
     }
 

@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Head, Link, router, usePage } from "@inertiajs/react";
 import ApexCharts from "react-apexcharts";
 import Pagination from "@/components/Pagination";
-import Swal from "sweetalert2";
 import { cn } from "@/lib/utils";
 import { Clock, CheckCircle, Check, Loader } from "lucide-react";
 import {
@@ -40,28 +39,12 @@ export default function HomePage() {
     }, [stats]);
 
     useEffect(() => {
-        if (flash?.success) {
-            Swal.fire({
-                icon: "success",
-                title: "Berhasil!",
-                text: flash.success,
-                toast: true,
-                position: "top-end",
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true,
-            });
-        } else if (flash?.error) {
-            Swal.fire({
-                icon: "error",
-                title: "Gagal!",
-                text: flash.error,
-                toast: true,
-                position: "top-end",
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true,
-            });
+        if (!flash) return;
+
+        if (flash.success) {
+            window.alert(`Berhasil!\n${flash.success}`);
+        } else if (flash.error) {
+            window.alert(`Gagal!\n${flash.error}`);
         }
     }, [flash]);
 
@@ -80,20 +63,13 @@ export default function HomePage() {
     };
 
     const handleDelete = (plan) => {
-        Swal.fire({
-            title: "Anda yakin?",
-            text: `Anda akan menghapus rencana "${plan.title}". Tindakan ini tidak dapat dibatalkan!`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#d33",
-            cancelButtonColor: "#3085d6",
-            confirmButtonText: "Ya, hapus!",
-            cancelButtonText: "Batal",
-        }).then((result) => {
-            if (result.isConfirmed) {
-                router.delete(route("plans.destroy", plan.id));
-            }
-        });
+        const confirmed = window.confirm(
+            `Anda akan menghapus rencana "${plan.title}". Tindakan ini tidak dapat dibatalkan!`
+        );
+
+        if (confirmed) {
+            router.delete(route("plans.destroy", plan.id));
+        }
     };
 
     const handleToggleComplete = (plan) => {

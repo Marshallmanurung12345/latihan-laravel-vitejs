@@ -7,7 +7,6 @@ import {
     SearchIcon,
     TrashIcon,
 } from "@heroicons/react/24/solid";
-import Swal from "sweetalert2";
 
 // Komponen untuk Pagination Links
 const Pagination = ({ links }) => {
@@ -44,30 +43,14 @@ export default function Home({ plans, filters, stats }) {
     const { flash } = usePage().props;
     const [search, setSearch] = useState(filters.search || "");
 
-    // Efek untuk menampilkan notifikasi SweetAlert2
+    // Efek untuk menampilkan notifikasi alert bawaan browser
     useEffect(() => {
+        if (!flash) return;
+
         if (flash.success) {
-            Swal.fire({
-                icon: "success",
-                title: "Berhasil!",
-                text: flash.success,
-                toast: true,
-                position: "top-end",
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true,
-            });
+            window.alert(`Berhasil!\n${flash.success}`);
         } else if (flash.error) {
-            Swal.fire({
-                icon: "error",
-                title: "Gagal!",
-                text: flash.error,
-                toast: true,
-                position: "top-end",
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true,
-            });
+            window.alert(`Gagal!\n${flash.error}`);
         }
     }, [flash]);
 
@@ -79,20 +62,13 @@ export default function Home({ plans, filters, stats }) {
 
     // Fungsi untuk menghapus data dengan konfirmasi
     const handleDelete = (plan) => {
-        Swal.fire({
-            title: "Anda yakin?",
-            text: `Anda akan menghapus rencana "${plan.title}". Tindakan ini tidak dapat dibatalkan!`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#d33",
-            cancelButtonColor: "#3085d6",
-            confirmButtonText: "Ya, hapus!",
-            cancelButtonText: "Batal",
-        }).then((result) => {
-            if (result.isConfirmed) {
-                router.delete(route("plans.destroy", plan.id));
-            }
-        });
+        const confirmed = window.confirm(
+            `Anda akan menghapus rencana "${plan.title}". Tindakan ini tidak dapat dibatalkan!`
+        );
+
+        if (confirmed) {
+            router.delete(route("plans.destroy", plan.id));
+        }
     };
 
     // Konfigurasi untuk ApexCharts
