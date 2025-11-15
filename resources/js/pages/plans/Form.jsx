@@ -17,6 +17,13 @@ import {
     CardDescription,
 } from "@/components/ui/card";
 
+const STATUS_OPTIONS = [
+    { value: "todo", label: "Belum dimulai" },
+    { value: "pending", label: "Tertunda" },
+    { value: "in_progress", label: "Sedang dikerjakan" },
+    { value: "completed", label: "Selesai" },
+];
+
 export default function FormPage({ plan }) {
     const isEditing = !!plan;
     const fileInputRef = useRef();
@@ -25,6 +32,7 @@ export default function FormPage({ plan }) {
     const { data, setData, post, processing, errors } = useForm({
         title: plan?.title || "",
         content: plan?.content || "",
+        status: plan?.status || "todo",
         cover_image: null,
         _method: isEditing ? "PUT" : "POST",
     });
@@ -144,6 +152,38 @@ export default function FormPage({ plan }) {
                                         {errors.content && (
                                             <FieldDescription className="text-destructive">
                                                 {errors.content}
+                                            </FieldDescription>
+                                        )}
+                                    </Field>
+
+                                    <Field>
+                                        <FieldLabel htmlFor="status">
+                                            Status
+                                        </FieldLabel>
+                                        <select
+                                            id="status"
+                                            value={data.status}
+                                            onChange={(e) =>
+                                                setData(
+                                                    "status",
+                                                    e.target.value
+                                                )
+                                            }
+                                            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-xs focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+                                            aria-invalid={!!errors.status}
+                                        >
+                                            {STATUS_OPTIONS.map((option) => (
+                                                <option
+                                                    key={option.value}
+                                                    value={option.value}
+                                                >
+                                                    {option.label}
+                                                </option>
+                                            ))}
+                                        </select>
+                                        {errors.status && (
+                                            <FieldDescription className="text-destructive">
+                                                {errors.status}
                                             </FieldDescription>
                                         )}
                                     </Field>
