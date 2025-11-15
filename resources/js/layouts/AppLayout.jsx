@@ -15,7 +15,7 @@ export default function AppLayout({ children }) {
                     <div className="flex h-16 items-center justify-between">
                         <div className="flex items-center space-x-4">
                             <Link href="/" className="text-lg font-bold">
-                                DelTodos
+                                MarshallTodos
                             </Link>
                         </div>
                         <Button variant="outline" size="sm" onClick={onLogout}>

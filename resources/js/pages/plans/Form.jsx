@@ -9,14 +9,20 @@ import {
     FieldDescription,
     FieldGroup,
 } from "@/components/ui/field";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+    Card,
+    CardContent,
+    CardHeader,
+    CardTitle,
+    CardDescription,
+} from "@/components/ui/card";
 
 export default function FormPage({ plan }) {
     const isEditing = !!plan;
     const fileInputRef = useRef();
     const [previewUrl, setPreviewUrl] = useState(plan?.cover_image_url || null);
 
-    const { data, setData, post, put, processing, errors } = useForm({
+    const { data, setData, post, processing, errors } = useForm({
         title: plan?.title || "",
         content: plan?.content || "",
         cover_image: null,
@@ -41,17 +47,14 @@ export default function FormPage({ plan }) {
 
     function handleSubmit(e) {
         e.preventDefault();
-        const options = {
-            preserveScroll: true,
-        };
+        const options = { preserveScroll: true };
         if (isEditing) {
-            // Inertia's 'put' method doesn't support multipart/form-data well.
-            // We use 'post' with a spoofed '_method' for file uploads on updates.
             post(route("plans.update", plan.id), options);
         } else {
             post(route("plans.store"), options);
         }
     }
+
     useEffect(() => {
         return () => {
             if (previewUrl && previewUrl.startsWith("blob:")) {
@@ -64,96 +67,147 @@ export default function FormPage({ plan }) {
         <AppLayout>
             <Head title={isEditing ? "Edit Rencana" : "Tambah Rencana"} />
 
-            <div className="container mx-auto px-4 py-8">
-                <Card className="max-w-3xl mx-auto">
-                    <CardHeader>
-                        <CardTitle className="text-2xl">
-                            {isEditing ? "Edit Rencana" : "Tambah Rencana Baru"}
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <form onSubmit={handleSubmit}>
-                            <FieldGroup>
-                                <Field>
-                                    <FieldLabel htmlFor="title">
-                                        Judul
-                                    </FieldLabel>
-                                    <Input
-                                        type="text"
-                                        id="title"
-                                        value={data.title}
-                                        onChange={(e) =>
-                                            setData("title", e.target.value)
-                                        }
-                                        placeholder="Masukkan judul rencana..."
-                                        aria-invalid={!!errors.title}
-                                    />
-                                    {errors.title && (
-                                        <FieldDescription className="text-destructive">
-                                            {errors.title}
-                                        </FieldDescription>
-                                    )}
-                                </Field>
+            <div className="bg-muted/30">
+                <div className="container mx-auto px-4 py-10 space-y-8">
+                    <section className="rounded-3xl bg-card border shadow-sm p-8 text-center space-y-4">
+                        <p className="text-sm uppercase tracking-[0.3em] text-muted-foreground">
+                            {isEditing ? "Perbarui Rencana" : "Rencana Baru"}
+                        </p>
+                        <div className="space-y-2">
+                            <h1 className="text-3xl font-bold">
+                                {isEditing
+                                    ? plan?.title || "Edit Rencana"
+                                    : "Susun rencana terbaikmu"}
+                            </h1>
+                            <p className="text-muted-foreground max-w-2xl mx-auto">
+                                Tambahkan detail rencana lengkap dengan catatan
+                                dan foto sampul untuk menjaga fokus dan
+                                dokumentasi pekerjaanmu.
+                            </p>
+                        </div>
+                    </section>
 
-                                <Field>
-                                    <FieldLabel htmlFor="content">
-                                        Konten
-                                    </FieldLabel>
-                                    <textarea
-                                        id="content"
-                                        value={data.content}
-                                        onChange={(e) =>
-                                            setData("content", e.target.value)
-                                        }
-                                        rows={10}
-                                        className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                                        placeholder="Tulis detail rencana Anda di sini..."
-                                        aria-invalid={!!errors.content}
-                                    />
-                                    {errors.content && (
-                                        <FieldDescription className="text-destructive">
-                                            {errors.content}
-                                        </FieldDescription>
-                                    )}
-                                </Field>
+                    <Card className="max-w-4xl mx-auto shadow-lg">
+                        <CardHeader>
+                            <CardTitle>
+                                {isEditing
+                                    ? "Edit Rencana"
+                                    : "Tambah Rencana Baru"}
+                            </CardTitle>
+                            <CardDescription>
+                                Lengkapi informasi di bawah ini, lalu simpan
+                                ketika semuanya sudah siap.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <form onSubmit={handleSubmit} className="space-y-8">
+                                <FieldGroup className="space-y-6">
+                                    <Field>
+                                        <FieldLabel htmlFor="title">
+                                            Judul
+                                        </FieldLabel>
+                                        <Input
+                                            type="text"
+                                            id="title"
+                                            value={data.title}
+                                            onChange={(e) =>
+                                                setData("title", e.target.value)
+                                            }
+                                            placeholder="Masukkan judul rencana..."
+                                            aria-invalid={!!errors.title}
+                                        />
+                                        {errors.title && (
+                                            <FieldDescription className="text-destructive">
+                                                {errors.title}
+                                            </FieldDescription>
+                                        )}
+                                    </Field>
 
-                                <Field>
-                                    <FieldLabel htmlFor="cover_image">
-                                        Foto Sampul (Opsional)
-                                    </FieldLabel>
-                                    {previewUrl && (
-                                        <div className="mt-2 mb-4">
-                                            <img
-                                                src={previewUrl}
-                                                alt="Pratinjau"
-                                                className="w-full h-48 object-cover rounded-md"
-                                            />
-                                            <Button
-                                                type="button"
-                                                variant="link"
-                                                className="text-destructive px-0"
-                                                onClick={clearImage}
-                                            >
-                                                Hapus Gambar
-                                            </Button>
+                                    <Field>
+                                        <FieldLabel htmlFor="content">
+                                            Deskripsi
+                                        </FieldLabel>
+                                        <textarea
+                                            id="content"
+                                            value={data.content}
+                                            onChange={(e) =>
+                                                setData(
+                                                    "content",
+                                                    e.target.value
+                                                )
+                                            }
+                                            rows={10}
+                                            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-xs focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+                                            placeholder="Tulis detail rencana Anda di sini..."
+                                            aria-invalid={!!errors.content}
+                                        />
+                                        {errors.content && (
+                                            <FieldDescription className="text-destructive">
+                                                {errors.content}
+                                            </FieldDescription>
+                                        )}
+                                    </Field>
+
+                                    <Field>
+                                        <FieldLabel htmlFor="cover_image">
+                                            Foto Sampul (opsional)
+                                        </FieldLabel>
+                                        <div className="rounded-2xl border border-dashed border-border bg-card/40 p-4">
+                                            {previewUrl ? (
+                                                <div className="space-y-3">
+                                                    <img
+                                                        src={previewUrl}
+                                                        alt="Pratinjau sampul"
+                                                        className="w-full h-56 object-cover rounded-xl"
+                                                    />
+                                                    <div className="flex items-center justify-between">
+                                                        <span className="text-sm text-muted-foreground">
+                                                            Gambar berhasil
+                                                            dipilih
+                                                        </span>
+                                                        <Button
+                                                            type="button"
+                                                            variant="ghost"
+                                                            className="text-destructive"
+                                                            onClick={clearImage}
+                                                        >
+                                                            Hapus gambar
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <p className="text-sm text-muted-foreground text-center">
+                                                    Unggah gambar untuk
+                                                    mempercantik detail rencana.
+                                                </p>
+                                            )}
+                                            <div className="mt-4">
+                                                <Input
+                                                    type="file"
+                                                    id="cover_image"
+                                                    onChange={handleFileChange}
+                                                    ref={fileInputRef}
+                                                    aria-invalid={
+                                                        !!errors.cover_image
+                                                    }
+                                                />
+                                                {errors.cover_image && (
+                                                    <FieldDescription className="text-destructive">
+                                                        {errors.cover_image}
+                                                    </FieldDescription>
+                                                )}
+                                            </div>
                                         </div>
-                                    )}
-                                    <Input
-                                        type="file"
-                                        id="cover_image"
-                                        onChange={handleFileChange}
-                                        ref={fileInputRef}
-                                        aria-invalid={!!errors.cover_image}
-                                    />
-                                    {errors.cover_image && (
-                                        <FieldDescription className="text-destructive">
-                                            {errors.cover_image}
-                                        </FieldDescription>
-                                    )}
-                                </Field>
+                                    </Field>
+                                </FieldGroup>
 
-                                <div className="flex items-center justify-end space-x-4 pt-4">
-                                    <Link href={route("plans.index")}>
+                                <div className="flex flex-wrap items-center justify-end gap-3 border-t border-border pt-4">
+                                    <Link
+                                        href={
+                                            route("plans.index") ??
+                                            route("home")
+                                        }
+                                    >
                                         <Button type="button" variant="outline">
                                             Batal
                                         </Button>
@@ -166,10 +220,10 @@ export default function FormPage({ plan }) {
                                             : "Simpan"}
                                     </Button>
                                 </div>
-                            </FieldGroup>
-                        </form>
-                    </CardContent>
-                </Card>
+                            </form>
+                        </CardContent>
+                    </Card>
+                </div>
             </div>
         </AppLayout>
     );

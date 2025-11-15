@@ -36,96 +36,97 @@ export default function LoginPage() {
 
     return (
         <AuthLayout>
-            <div className="container mx-auto px-4 py-8">
-                <div className="w-[360px] mx-auto">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Masuk ke akun Anda</CardTitle>
-                            <CardDescription>
-                                Masukkan email Anda untuk masuk ke akun
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            {success && (
-                                <div className="mb-4">
-                                    <Alert>
-                                        <CheckCircle2Icon />
-                                        <AlertTitle>Success!</AlertTitle>
-                                        <AlertDescription>
-                                            {success}
-                                        </AlertDescription>
-                                    </Alert>
-                                </div>
-                            )}
-
-                            <form onSubmit={handleSubmit}>
-                                <FieldGroup>
-                                    <Field>
-                                        <FieldLabel htmlFor="email">
-                                            Email
-                                        </FieldLabel>
-                                        <Input
-                                            id="email"
-                                            type="email"
-                                            placeholder="contoh@email.com"
-                                            value={data.email}
-                                            onChange={(e) =>
-                                                setData("email", e.target.value)
-                                            }
-                                        />
-                                        {errors.email && (
-                                            <div className="text-sm text-red-600">
-                                                {errors.email}
-                                            </div>
-                                        )}
-                                    </Field>
-                                    <Field>
-                                        <FieldLabel htmlFor="password">
-                                            Kata Sandi
-                                        </FieldLabel>
-                                        <Input
-                                            id="password"
-                                            type="password"
-                                            placeholder="Masukkan kata sandi"
-                                            value={data.password}
-                                            onChange={(e) =>
-                                                setData(
-                                                    "password",
-                                                    e.target.value
-                                                )
-                                            }
-                                        />
-                                        {errors.password && (
-                                            <div className="text-sm text-red-600">
-                                                {errors.password}
-                                            </div>
-                                        )}
-                                    </Field>
-                                    <Field>
-                                        <Button
-                                            type="submit"
-                                            className="w-full"
-                                            disabled={processing}
-                                        >
-                                            {processing
-                                                ? "Memproses..."
-                                                : "Masuk"}
-                                        </Button>
-                                        <FieldDescription className="text-center">
-                                            Belum punya akun?{" "}
-                                            <a
-                                                href="/auth/register"
-                                                className="text-primary hover:underline"
-                                            >
-                                                Daftar di sini
-                                            </a>
-                                        </FieldDescription>
-                                    </Field>
-                                </FieldGroup>
-                            </form>
-                        </CardContent>
-                    </Card>
+            <div className="space-y-6">
+                <div className="text-center space-y-2">
+                    <h1 className="text-2xl font-semibold tracking-tight">
+                        Selamat datang kembali
+                    </h1>
+                    <p className="text-sm text-muted-foreground">
+                        Masuk untuk melanjutkan rencana dan catatan Anda.
+                    </p>
                 </div>
+                <Card className="shadow-lg">
+                    <CardHeader>
+                        <CardTitle>Masuk ke akun Anda</CardTitle>
+                        <CardDescription>
+                            Masukkan email Anda untuk masuk ke akun
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        {success && (
+                            <div className="mb-4">
+                                <Alert>
+                                    <CheckCircle2Icon />
+                                    <AlertTitle>Success!</AlertTitle>
+                                    <AlertDescription>
+                                        {success}
+                                    </AlertDescription>
+                                </Alert>
+                            </div>
+                        )}
+
+                        <form onSubmit={handleSubmit}>
+                            <FieldGroup>
+                                <Field>
+                                    <FieldLabel htmlFor="email">
+                                        Email
+                                    </FieldLabel>
+                                    <Input
+                                        id="email"
+                                        type="email"
+                                        placeholder="contoh@email.com"
+                                        value={data.email}
+                                        onChange={(e) =>
+                                            setData("email", e.target.value)
+                                        }
+                                    />
+                                    {errors.email && (
+                                        <div className="text-sm text-red-600">
+                                            {errors.email}
+                                        </div>
+                                    )}
+                                </Field>
+                                <Field>
+                                    <FieldLabel htmlFor="password">
+                                        Kata Sandi
+                                    </FieldLabel>
+                                    <Input
+                                        id="password"
+                                        type="password"
+                                        placeholder="Masukkan kata sandi"
+                                        value={data.password}
+                                        onChange={(e) =>
+                                            setData("password", e.target.value)
+                                        }
+                                    />
+                                    {errors.password && (
+                                        <div className="text-sm text-red-600">
+                                            {errors.password}
+                                        </div>
+                                    )}
+                                </Field>
+                                <Field>
+                                    <Button
+                                        type="submit"
+                                        className="w-full"
+                                        disabled={processing}
+                                    >
+                                        {processing ? "Memproses..." : "Masuk"}
+                                    </Button>
+                                    <FieldDescription className="text-center">
+                                        Belum punya akun?{" "}
+                                        <a
+                                            href="/auth/register"
+                                            className="text-primary hover:underline"
+                                        >
+                                            Daftar di sini
+                                        </a>
+                                    </FieldDescription>
+                                </Field>
+                            </FieldGroup>
+                        </form>
+                    </CardContent>
+                </Card>
             </div>
         </AuthLayout>
     );

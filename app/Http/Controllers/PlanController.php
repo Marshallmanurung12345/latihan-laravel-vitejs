@@ -131,6 +131,37 @@ class PlanController extends Controller
         return to_route('home')->with('success', 'Rencana berhasil diperbarui!');
     }
 
+    public function markComplete(Plan $plan): RedirectResponse
+    {
+        if ($plan->status !== Plan::STATUS_COMPLETED) {
+            $plan->update([
+                'status' => Plan::STATUS_COMPLETED,
+                'completed_at' => now(),
+            ]);
+        }
+
+        return to_route('home')->with('success', 'Rencana ditandai selesai.');
+    }
+
+    public function toggleCompletion(Plan $plan): RedirectResponse
+    {
+        if ($plan->status === Plan::STATUS_COMPLETED) {
+            $plan->update([
+                'status' => Plan::STATUS_PENDING,
+                'completed_at' => null,
+            ]);
+
+            return to_route('home')->with('success', 'Status rencana dikembalikan ke tertunda.');
+        }
+
+        $plan->update([
+            'status' => Plan::STATUS_COMPLETED,
+            'completed_at' => now(),
+        ]);
+
+        return to_route('home')->with('success', 'Rencana ditandai selesai.');
+    }
+
     /**
      * Menghapus rencana dari database.
      */
