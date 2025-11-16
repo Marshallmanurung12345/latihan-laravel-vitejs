@@ -1,5 +1,5 @@
 import React from "react";
-import { useForm, usePage, Link } from "@inertiajs/react";
+import { Link, useForm, usePage } from "@inertiajs/react";
 import AuthLayout from "@/layouts/AuthLayout";
 import {
     Card,
@@ -47,7 +47,7 @@ export default function LoginPage() {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        post("/auth/login/post");
+        post(route("auth.login.post"));
     };
 
     return (
@@ -177,7 +177,7 @@ export default function LoginPage() {
                             <FieldDescription className="text-center text-sm text-muted-foreground">
                                 Belum punya akun?{" "}
                                 <Link
-                                    href={route("register")}
+                                    href={route("auth.register")}
                                     className="font-semibold text-primary hover:underline"
                                 >
                                     Daftar di sini

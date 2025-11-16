@@ -26,7 +26,7 @@ export default function RegisterPage() {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        post("/auth/register/post", {
+        post(route("auth.register.post"), {
             onSuccess: () => {
                 reset("name", "email", "password");
             },
@@ -129,7 +129,7 @@ export default function RegisterPage() {
                                     <FieldDescription className="text-center">
                                         Sudah punya akun?{" "}
                                         <Link
-                                            href="/auth/login"
+                                            href={route("auth.login")}
                                             className="text-primary hover:underline"
                                         >
                                             Masuk di sini

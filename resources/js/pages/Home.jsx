@@ -61,11 +61,10 @@ export default function Home({ plans, filters, stats }) {
     const [search, setSearch] = useState(filters.search || "");
     const [alert, setAlert] = useState(null);
 
-    // Sederhanakan logika flash message
     useEffect(() => {
-        if (flash?.success) {
+        if (flash.success) {
             setAlert({ message: flash.success, variant: "success" });
-        } else if (flash?.error) {
+        } else if (flash.error) {
             setAlert({ message: flash.error, variant: "error" });
         }
     }, [flash]);

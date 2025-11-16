@@ -10,7 +10,7 @@ import { route } from "ziggy-js";
 window.route = route; // bikin global, biar bisa dipakai di semua JSX
 
 createInertiaApp({
-    title: (title) => `${title} - My App`, // Opsional: Menambahkan judul default untuk halaman
+    title: (title) => `${title} - My App`,
     resolve: (name) =>
         resolvePageComponent(
             `./Pages/${name}.jsx`,
@@ -19,8 +19,6 @@ createInertiaApp({
     setup({ el, App, props }) {
         createRoot(el).render(<App {...props} />);
     },
-    progress: {
-        // Opsional: Menambahkan progress bar saat navigasi halaman
-        color: "#4B5563",
-    },
+    progress: { color: "#4B5563" },
 });
+

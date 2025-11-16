@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -15,11 +14,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('plans', function (Blueprint $table) {
-            // Menggunakan change() untuk memodifikasi kolom.
-            // Ini lebih portabel daripada raw SQL statement.
-            $table->enum('status', $this->statuses)->default('todo')->change();
-        });
+        // Menggunakan raw statement karena change() dengan enum bisa kompleks
+        // dan ini adalah cara yang paling andal untuk memodifikasi tipe ENUM.
+        // Pastikan Anda sudah mem-backup data sebelum menjalankan ini di production.
+        \Illuminate\Support\Facades\DB::statement("ALTER TABLE plans CHANGE COLUMN status status ENUM('todo', 'pending', 'in_progress', 'completed') NOT NULL DEFAULT 'todo'");
     }
 
     /**
@@ -27,8 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('plans', function (Blueprint $table) {
-            $table->enum('status', $this->old_statuses)->default('pending')->change();
-        });
+        \Illuminate\Support\Facades\DB::statement("ALTER TABLE plans CHANGE COLUMN status status ENUM('pending', 'in_progress', 'completed') NOT NULL DEFAULT 'pending'");
     }
 };

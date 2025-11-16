@@ -201,7 +201,8 @@ export default function FormPage({ plan }) {
                                         <FieldLabel htmlFor="image">
                                             Foto Sampul (opsional)
                                         </FieldLabel>
-                                        <div className="rounded-2xl border border-dashed border-border bg-card/40 p-4">
+                                       <div className="rounded-2xl border border-dashed border-gray-300 bg-card/40 p-4">
+
                                             {previewUrl ? (
                                                 <div className="space-y-3">
                                                     <img
@@ -250,7 +251,8 @@ export default function FormPage({ plan }) {
                                     </Field>
                                 </FieldGroup>
 
-                                <div className="flex flex-wrap items-center justify-end gap-3 border-t border-border pt-4">
+                               <div className="flex flex-wrap items-center justify-end gap-3 border-t border-gray-300 pt-4">
+
                                     <Link
                                         href={
                                             route("plans.index") ??
