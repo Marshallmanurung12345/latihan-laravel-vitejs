@@ -10,17 +10,23 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('todos', function (Blueprint $table) {
-            $table->id();
-            $table->bigInteger('user_id')->unsigned();
-            $table->string('title');
-            $table->text('description')->nullable();
-            $table->boolean('is_finished')->default(false);
-            $table->string('cover')->nullable();
-            $table->timestamps();
+        // Cegah error kalau tabel 'todos' sudah terlanjur ada
+        if (!Schema::hasTable('todos')) {
+            Schema::create('todos', function (Blueprint $table) {
+                $table->id();
+                $table->unsignedBigInteger('user_id');
+                $table->string('title');
+                $table->text('description')->nullable();
+                $table->boolean('is_finished')->default(false);
+                $table->string('cover')->nullable();
+                $table->timestamps();
 
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-        });
+                $table->foreign('user_id')
+                      ->references('id')
+                      ->on('users')
+                      ->onDelete('cascade');
+            });
+        }
     }
 
     /**
