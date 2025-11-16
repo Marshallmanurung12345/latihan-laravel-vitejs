@@ -1,5 +1,5 @@
 import { Head, Link, router, usePage } from "@inertiajs/react";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import ReactApexChart from "react-apexcharts";
 import {
     PencilIcon,
@@ -61,21 +61,24 @@ export default function Home({ plans, filters, stats }) {
     const [search, setSearch] = useState(filters.search || "");
     const [alert, setAlert] = useState(null);
 
+    // Sederhanakan logika flash message
     useEffect(() => {
-        if (!flash) return;
-        if (flash.success) {
+        if (flash?.success) {
             setAlert({ message: flash.success, variant: "success" });
-        } else if (flash.error) {
+        } else if (flash?.error) {
             setAlert({ message: flash.error, variant: "error" });
         }
     }, [flash]);
 
-    const handleSearch = (e) => {
-        e.preventDefault();
-        router.get(route("home"), { search }, { preserveState: true });
-    };
+    const handleSearch = useCallback(
+        (e) => {
+            e.preventDefault();
+            router.get(route("home"), { search }, { preserveState: true });
+        },
+        [search]
+    );
 
-    const handleDelete = (plan) => {
+    const handleDelete = useCallback((plan) => {
         const confirmed = window.confirm(
             `Anda akan menghapus rencana "${plan.title}". Tindakan ini tidak dapat dibatalkan!`
         );
@@ -83,7 +86,7 @@ export default function Home({ plans, filters, stats }) {
         if (confirmed) {
             router.delete(route("plans.destroy", plan.id));
         }
-    };
+    }, []);
 
     const chartSeries = useMemo(
         () => [

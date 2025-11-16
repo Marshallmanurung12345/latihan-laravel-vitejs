@@ -22,6 +22,12 @@ class Plan extends Model
 
     protected $appends = ['cover_image_url'];
 
+    protected $casts = [
+        'completed_at' => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
+
     // Status constants
     const STATUS_PENDING = 'pending';
     const STATUS_TODO = 'todo';

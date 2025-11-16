@@ -2,19 +2,24 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    // Daftar status yang valid untuk kolom 'status'
+    private $statuses = ['todo', 'pending', 'in_progress', 'completed'];
+    private $old_statuses = ['pending', 'in_progress', 'completed'];
+
     /**
      * Run the migrations.
      */
     public function up(): void
     {
-        // Mengubah kolom enum untuk menambahkan 'todo'
-        // Sintaks ini kompatibel dengan MySQL dan PostgreSQL
-        DB::statement("ALTER TABLE plans CHANGE COLUMN status status ENUM('todo', 'pending', 'in_progress', 'completed') NOT NULL DEFAULT 'todo'");
+        Schema::table('plans', function (Blueprint $table) {
+            // Menggunakan change() untuk memodifikasi kolom.
+            // Ini lebih portabel daripada raw SQL statement.
+            $table->enum('status', $this->statuses)->default('todo')->change();
+        });
     }
 
     /**
@@ -22,8 +27,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // Mengembalikan ke definisi enum sebelumnya jika diperlukan
-        DB::statement("ALTER TABLE plans CHANGE COLUMN status status ENUM('pending', 'in_progress', 'completed') NOT NULL DEFAULT 'pending'");
+        Schema::table('plans', function (Blueprint $table) {
+            $table->enum('status', $this->old_statuses)->default('pending')->change();
+        });
     }
 };
-
